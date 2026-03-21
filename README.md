@@ -1,5 +1,7 @@
 # Demo vault (Work layout)
 
+Part of **[Talon-Obsidian-Setup](https://github.com/TalonSoftware-llc/Talon-Obsidian-Setup)** — Obsidian productivity setup from Talon Software.
+
 Scaffold matching the **Work** vault: **Tools** dashboards, **Templates**, **`Data/Tools/`**, plus a large **`Data/`** tree for Repository navigation.
 
 Open this folder as an Obsidian vault, or see the parent vault’s **`AGENTS.md`** for how Agenda / Projects / Repository fit together.
