@@ -4,22 +4,22 @@
     "type": "split",
     "children": [
       {
-        "id": "fc3e5344cfe391a3",
+        "id": "0c86241570059876",
         "type": "tabs",
         "children": [
           {
-            "id": "0c7f91b393152806",
+            "id": "4a5b308da1e0571b",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Tools/Repository.md",
-                "mode": "preview",
+                "file": "README.md",
+                "mode": "source",
                 "source": false,
                 "backlinks": false
               },
               "icon": "lucide-file",
-              "title": "Repository"
+              "title": "README"
             }
           }
         ]
@@ -166,11 +166,13 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "0c7f91b393152806",
+  "active": "4a5b308da1e0571b",
   "lastOpenFiles": [
+    "README.md",
+    "Tools/Repository.md",
+    "LICENSE",
     "Tools/Project Dashboard.md",
     "Data/Tools/Projects/SOC2 Prep/SOC2 Prep.md",
-    "Tools/Repository.md",
     "Tools/Agenda Dashboard.md",
     "Data/Tools/Projects/Release Train/Release Train.md",
     "Data/Tools/Projects/Health Score/Health Score.md",
@@ -195,14 +197,12 @@
     "Data/Tools/Projects/Customer Health Dashboard/Metric definitions.md",
     "Data/Tools/Projects/Partner Portal MVP/Partner Portal MVP.md",
     "Data/Tools/Projects/Customer Health Dashboard",
-    "Data/Tools/Projects/Partner Portal MVP",
     "Data/Tools/Projects/SOC 2 Readiness/Control inventory.md",
     "Data/Tools/Projects/SOC 2 Readiness/SOC 2 Readiness.md",
     "Data/Commercial Clients/Americas East/Board - Key Accounts/Note 04 - Next milestones.md",
     "Data/Tools/Repository/New/Template - mutual action plan.md",
     "Data/Tools/Repository/New/Competitor battlecard - AlphaCo.md",
     "Data/Tools/Repository/New/Snippet - elevator pitch.md",
-    "Data/Tools/Repository/New/Policy - expense thresholds.md",
-    "Data/Tools/Repository/New/Meeting - exec steering 2026-03.md"
+    "Data/Tools/Repository/New/Policy - expense thresholds.md"
   ]
 }
