@@ -1,0 +1,520 @@
+```css
+/* Remove code block border highlight on hover (Obsidian default) */
+.cm-preview-code-block:hover {
+  border-color: var(--background-modifier-border) !important;
+  box-shadow: none !important;
+}
+
+/* Outer wrapper: padding so cards sit evenly inside the code block */
+.project-cards-block {
+  padding: 1.25em 1.25em 1.25em 1.25em !important;
+  box-sizing: border-box;
+}
+
+/* Three cards per row: table layout, full width of block */
+.project-cards-container {
+  display: table !important;
+  width: 100% !important;
+  max-width: 100%;
+  table-layout: fixed;
+  margin: 0;
+  padding: 0;
+  border-collapse: separate !important;
+  border-spacing: 0.4em 0.8em !important;
+  box-sizing: border-box;
+}
+
+.project-cards-row {
+  display: table-row !important;
+}
+
+/* Vertical gap between rows: padding on cells (border-spacing can be unreliable) */
+.project-cards-row:not(:last-child) .project-card-cell {
+  padding-bottom: 0.8em !important;
+}
+
+/* Cell wrapper */
+.project-cards-row .project-card-cell {
+  display: table-cell !important;
+  width: 33.33% !important;
+  vertical-align: top;
+  padding-left: 0.4em !important;
+  padding-right: 0.4em !important;
+  box-sizing: border-box;
+}
+
+.project-cards-row .project-card {
+  display: block;
+  width: 100%;
+}
+
+.project-card {
+  position: relative;
+  width: 100%;
+  height: 260px;
+  min-width: 0;
+  margin: 0;
+  box-sizing: border-box;
+  border: 3px solid #2563eb;
+  border-radius: 14px;
+  padding: 1.2em 1em;
+  background: var(--background-secondary);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+  text-align: center;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  overflow: visible;
+}
+
+.project-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06);
+}
+
+.project-title {
+  margin: 0 0 0.4em 0;
+  font-size: 1.6em;
+  height: 2.4em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.2;
+  overflow: hidden;
+}
+
+.project-card .project-title a,
+.project-card .project-title a:hover {
+  color: #fff;
+  opacity: 1;
+  font-size: inherit !important;
+  font-weight: inherit;
+}
+
+/* Row: progress circle left, priority button right */
+.project-card-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 2em;
+  flex-wrap: wrap;
+}
+
+.circle-container {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.progress-circle {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(to top, #2e7d32 0%, #2e7d32 var(--percent), #ffffff var(--percent));
+  transition: background 0.8s ease;
+}
+
+/* Thin gray line at the fill level (inherits --fill-percent from .circle-container) */
+.progress-circle::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  bottom: calc(var(--fill-percent, 0) * 1%);
+  transform: translateY(50%);
+  background: #1a1a1a;
+  z-index: 2;
+  pointer-events: none;
+  transition: bottom 0.8s ease;
+}
+
+/* Percentage box centered in circle, at fill level (moves up/down with %) */
+.progress-indicator {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--fill-percent, 0) * 1%);
+  z-index: 3;
+  transform: translate(-50%, 50%);
+}
+
+/* Optional: thin line at fill level through center (hidden by default; set width if desired) */
+.progress-indicator-line {
+  display: none;
+}
+
+/* Dark gray box showing the percentage number */
+.progress-indicator-box {
+  padding: 0.25em 0.5em;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 1.1em;
+  font-weight: bold;
+  border-radius: 6px;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  position: relative;
+  z-index: 1;
+}
+
+/* Priority badge: circle in bottom-right */
+.priority-badge {
+  position: absolute;
+  bottom: 0.5em;
+  right: 0.5em;
+  width: 2em;
+  height: 2em;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #000000 !important;
+  color: #ffffff !important;
+  font-size: 0.8em;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  z-index: 4;
+  transition: background 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.priority-badge:hover {
+  background: #222222 !important;
+}
+
+/* Priority popup: arrow-left, number, arrow-right */
+.priority-popup {
+  display: none;
+  position: absolute;
+  bottom: 3em;
+  right: 0.3em;
+  z-index: 10;
+  background: #000000 !important;
+  border: 1px solid #444;
+  border-radius: 12px;
+  padding: 0.45em 0.6em;
+  align-items: center;
+  gap: 0.8em;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+  white-space: nowrap;
+}
+
+.priority-popup.open {
+  display: flex;
+}
+
+.priority-popup-value {
+  font-size: 1.3em;
+  font-weight: 700;
+  color: #ffffff !important;
+  min-width: 1.4em;
+  text-align: center;
+}
+
+.priority-popup-arrow {
+  width: 0;
+  height: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.priority-popup-left {
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
+  border-right: 13px solid #fff;
+}
+
+.priority-popup-left:hover {
+  border-right-color: #3b82f6;
+}
+
+.priority-popup-right {
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
+  border-left: 13px solid #fff;
+}
+
+.priority-popup-right:hover {
+  border-left-color: #3b82f6;
+}
+
+.project-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75em;
+  margin-bottom: 0.6em;
+  flex-wrap: wrap;
+}
+
+.project-dashboard-toggle {
+  display: inline-flex;
+  border-radius: 8px;
+  border: 1px solid var(--background-modifier-border);
+  overflow: hidden;
+}
+
+.project-toggle-btn {
+  padding: 0.35em 0.95em;
+  font-size: 0.85em;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.project-toggle-btn:hover:not(.active) {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.project-toggle-btn.active {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+.project-dashboard-empty {
+  margin: 0.5em 0 0 0;
+  color: var(--text-muted);
+  font-size: 0.95em;
+}
+
+.project-header-title {
+  margin: 0;
+  font-size: 1.3em;
+  font-weight: 600;
+}
+
+.project-new-btn {
+  padding: 0.4em 1em;
+  font-size: 0.85em;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid var(--interactive-accent);
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.project-new-btn:hover {
+  opacity: 0.85;
+}
+
+/* === Shared Links section (Projects + Agenda) === */
+.links-header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  margin-bottom: 1em;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.links-header-row .links-title {
+  margin: 0 0.5em 0 0;
+  font-size: 1.1em;
+}
+
+.links-link-btn {
+  padding: 0.35em 0.75em;
+  font-size: 0.85em;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid var(--interactive-accent);
+  background: var(--background-primary);
+  color: var(--interactive-accent);
+  cursor: pointer;
+}
+
+.links-link-btn:hover {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+/* Linked notes */
+.links-linked-section {
+  margin-bottom: 1em;
+}
+
+.links-subheading {
+  margin: 0 0 0.5em 0;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.links-linked-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.3em 0;
+}
+
+.links-linked-name {
+  flex: 1;
+  font-size: 0.9em;
+}
+
+.links-unlink-btn {
+  padding: 0 0.4em;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-faint);
+  font-size: 1em;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.links-unlink-btn:hover {
+  color: #c0392b;
+}
+
+/* Resources tree - Obsidian sidebar style */
+.links-tree-section {
+  margin-bottom: 1em;
+}
+
+.links-tree-sidebar .links-tree-folder {
+  margin-bottom: 0;
+}
+
+.links-tree-sidebar .links-tree-folder-header {
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+  padding: 0.15em 0;
+  cursor: pointer;
+  font-size: 0.9em;
+  user-select: none;
+}
+
+.links-tree-sidebar .links-tree-folder-header:hover {
+  color: var(--interactive-accent);
+}
+
+.links-tree-sidebar .links-tree-arrow {
+  font-size: 0.7em;
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.links-tree-sidebar .links-tree-folder-name {
+  font-weight: 500;
+  font-size: inherit;
+}
+
+.links-tree-sidebar .links-tree-folder-children {
+  margin-left: 0;
+  padding-left: 0;
+  border-left: none;
+}
+
+.links-tree-sidebar .links-tree-folder-children.collapsed {
+  display: none;
+}
+
+.links-tree-sidebar .links-tree-file {
+  padding: 0.15em 0;
+  padding-left: 1.2em;
+  font-size: 0.9em;
+}
+
+.links-tree-sidebar .links-tree-file-link {
+  font-size: inherit;
+}
+
+/* Legacy tree (non-sidebar) */
+.links-tree-folder-name {
+  font-size: 0.9em;
+  font-weight: 600;
+  padding: 0.2em 0;
+  color: var(--text-normal);
+}
+
+.links-tree-folder-children {
+  padding-left: 1.2em;
+  border-left: 1px solid var(--background-modifier-border);
+  margin-left: 0.5em;
+}
+
+.links-tree-file {
+  padding: 0.2em 0;
+}
+
+.links-tree-file-link {
+  font-size: 0.85em;
+}
+
+/* Link note search modal */
+.links-search-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(0.75rem, env(safe-area-inset-top, 0px)) max(0.75rem, env(safe-area-inset-right, 0px)) max(0.75rem, env(safe-area-inset-bottom, 0px)) max(0.75rem, env(safe-area-inset-left, 0px));
+  box-sizing: border-box;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  /* Above Obsidian panes, sticky UI, and menus so modal inputs can receive focus */
+  z-index: 100000;
+}
+
+.links-search-modal {
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 10px;
+  padding: 1em;
+  width: 500px;
+  max-width: 90vw;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+
+.links-search-modal h4 {
+  margin: 0 0 0.6em 0;
+  font-size: 1em;
+}
+
+.links-search-input {
+  width: 100%;
+  padding: 0.5em 0.75em;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-primary-alt);
+  font-size: 0.95em;
+  box-sizing: border-box;
+  margin-bottom: 0.5em;
+}
+
+.links-search-results {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.links-search-item {
+  padding: 0.4em 0.6em;
+  font-size: 0.85em;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--text-normal);
+}
+
+.links-search-item:hover {
+  background: var(--background-modifier-hover);
+  color: var(--interactive-accent);
+}

@@ -1,0 +1,29 @@
+/* Uniform status button sizes — applies to missions-status AND Metadata Menu */
+
+/* Missions-status (Project/Agenda notes) */
+.missions-status-btn,
+.missions-status-option,
+.missions-status-archive-opt {
+  min-width: 6.25em !important;
+  width: 100%;
+  text-align: center;
+}
+
+.missions-status-dropdown,
+.missions-status-archive-sub {
+  min-width: 6.25em !important;
+}
+
+/* Metadata Menu select/cycle field options */
+.metadata-menu-dv-field-container .values-container .item-container .label {
+  min-width: 6.25em !important;
+  text-align: center;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.metadata-menu-dv-field-container .value-container .label {
+  min-width: 6.25em !important;
+  text-align: center;
+}

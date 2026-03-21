@@ -1,0 +1,306 @@
+/* + Dashboard: sections + cards + process */
+
+/* Remove code block border highlight on hover (Obsidian default) */
+.cm-preview-code-block:hover {
+  border-color: var(--background-modifier-border) !important;
+  box-shadow: none !important;
+}
+
+.plus-section {
+  margin-bottom: 2em;
+}
+
+.plus-section-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  margin-bottom: 1em;
+}
+
+.plus-section-header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  padding-right: 2.5em;
+}
+
+.plus-section-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-left: auto;
+  width: 12em;
+  justify-content: flex-end;
+}
+
+.plus-select-all {
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-right: 0.25em;
+}
+
+.plus-section-actions .plus-btn {
+  min-width: 5.2em;
+  width: 5.2em;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.plus-header-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em;
+  padding-top: 0.3em;
+  border-top: 1px dashed var(--background-modifier-border);
+  align-self: flex-end;
+  justify-content: flex-end;
+}
+
+.plus-header-project-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em;
+  padding-top: 0.3em;
+  width: 100%;
+  justify-content: flex-end;
+}
+
+.plus-section-title {
+  margin: 0;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.plus-section-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.6em;
+  height: 1.6em;
+  padding: 0 0.4em;
+  border-radius: 50%;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  font-size: 0.8em;
+  font-weight: 600;
+}
+
+.plus-section:last-of-type {
+  margin-bottom: 0;
+}
+
+/* Spacing between New and Working On sections */
+.plus-section-spaced {
+  margin-top: 2em;
+}
+
+.plus-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+}
+
+.plus-card {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 0.5em 1em;
+  background: var(--background-secondary);
+  transition: border-color 0.15s ease, background 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
+  min-height: 0;
+}
+
+.plus-card-checkbox {
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.plus-card:hover {
+  border-color: var(--interactive-accent);
+  background: var(--background-secondary-alt);
+}
+
+.plus-card-title {
+  margin: 0;
+  font-size: 0.95em;
+  font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plus-card-title a.internal-link {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-decoration: none;
+  color: var(--link-color);
+}
+
+.plus-card-title a.internal-link:hover {
+  color: var(--interactive-accent);
+}
+
+.plus-card-preview {
+  font-size: 0.8em;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 12em;
+  flex-shrink: 0;
+}
+
+.plus-card-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.35em;
+  flex-shrink: 0;
+}
+
+/* Process: compact rows with actions */
+.plus-process {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  margin-top: 0.5em;
+}
+
+.plus-process-row {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  flex-wrap: wrap;
+  padding: 0.6em 0.9em;
+  border-radius: 8px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+}
+
+.plus-process-row:hover {
+  border-color: var(--background-modifier-border-hover);
+}
+
+.plus-process-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.plus-process-info a.internal-link {
+  text-decoration: none;
+  font-weight: 500;
+  color: var(--link-color);
+}
+
+.plus-process-info a.internal-link:hover {
+  color: var(--interactive-accent);
+}
+
+.plus-process-preview {
+  font-size: 0.8em;
+  color: var(--text-muted);
+  margin-top: 0.15em;
+  word-break: break-all;
+}
+
+.plus-process-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
+  flex-shrink: 0;
+}
+
+.plus-btn {
+  padding: 0.3em 0.6em;
+  font-size: 0.8em;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  cursor: pointer;
+  color: var(--text-normal);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.plus-btn:hover {
+  background: var(--background-modifier-hover);
+  border-color: var(--interactive-accent);
+}
+
+.plus-btn-archive {
+  border-color: var(--background-modifier-border);
+  color: var(--text-muted);
+}
+
+.plus-btn-move {
+  border-color: var(--interactive-accent);
+  color: var(--interactive-accent);
+}
+
+/* Move to: first level = Projects, Ideas, Working On */
+.plus-move-picker {
+  width: 100%;
+  margin-top: 0.4em;
+  padding-top: 0.4em;
+  border-top: 1px dashed var(--background-modifier-border);
+  display: none;
+}
+
+.plus-move-picker.visible {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em;
+}
+
+.plus-picker-option {
+  padding: 0.25em 0.5em;
+  font-size: 0.8em;
+  border-radius: 4px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary-alt);
+  cursor: pointer;
+  color: var(--text-normal);
+}
+
+.plus-picker-option:hover {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+/* Projects: second level = list of project names */
+.plus-project-list {
+  width: 100%;
+  margin-top: 0.35em;
+  padding-top: 0.35em;
+  border-top: 1px dashed var(--background-modifier-border);
+  display: none;
+  flex-wrap: wrap;
+  gap: 0.3em;
+}
+
+.plus-project-list.visible {
+  display: flex;
+}
+
+.plus-project-option {
+  padding: 0.2em 0.45em;
+  font-size: 0.75em;
+  border-radius: 4px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  cursor: pointer;
+  color: var(--text-normal);
+}
+
+.plus-project-option:hover {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}

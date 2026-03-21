@@ -1,0 +1,1640 @@
+/* Missions Dashboard */
+
+/* Agenda section */
+/* Week progress row (Mon–Sun) */
+.missions-agenda-week-wrap {
+  display: flex;
+  justify-content: center;
+  gap: 0.75em;
+  margin-top: 1.5em;
+  margin-bottom: 1.25em;
+  padding-top: 1.5em;
+  flex-wrap: wrap;
+}
+
+.missions-agenda-week-dot {
+  --size: 2.5rem;
+  --progress: 0;
+  --progress-color: #8b5cf6;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--progress-color) calc(var(--progress) * 1%),
+    var(--background-modifier-border) 0
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.missions-agenda-week-dot::before {
+  content: "";
+  width: calc(var(--size) - 8px);
+  height: calc(var(--size) - 8px);
+  border-radius: 50%;
+  background: var(--background-primary);
+  position: absolute;
+  top: 4px;
+  left: 4px;
+}
+
+.missions-agenda-week-dot {
+  position: relative;
+}
+
+.missions-agenda-week-dot-letter {
+  position: relative;
+  z-index: 1;
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.missions-agenda-week-dot-today .missions-agenda-week-dot-letter {
+  color: var(--interactive-accent);
+}
+
+.missions-agenda-week-dot-today {
+  box-shadow: 0 0 0 2px var(--interactive-accent);
+}
+
+.missions-agenda-section {
+  margin-top: 1.5em;
+  margin-bottom: 2em;
+}
+
+.missions-agenda-title {
+  margin: 0 0 0.85em 0;
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.missions-agenda-subtitle {
+  margin: 0 0 0.75em 0;
+  font-size: 0.9em;
+  color: var(--text-muted);
+}
+
+.missions-agenda-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+}
+
+.missions-agenda-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6em;
+  padding: 0.6em 0.9em;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-secondary);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.missions-agenda-card:hover {
+  border-color: var(--interactive-accent);
+  background: var(--background-secondary-alt);
+}
+
+.missions-agenda-card.missions-agenda-card-done {
+  background: rgba(34, 197, 94, 0.25) !important;
+  border-color: #22c55e !important;
+}
+
+.missions-agenda-card.missions-agenda-card-done .missions-agenda-item {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.missions-agenda-card.missions-agenda-card-overdue {
+  background: rgba(185, 28, 28, 0.2) !important;
+  border-color: #b91c1c !important;
+}
+
+.missions-agenda-checkbox {
+  margin-top: 0.2em;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.missions-agenda-card-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+}
+
+.missions-agenda-item-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+}
+
+.missions-agenda-item {
+  cursor: pointer;
+  font-size: 0.95em;
+  font-weight: 500;
+  flex: 1;
+  min-width: 0;
+}
+
+.missions-agenda-title-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.missions-agenda-title-link:hover {
+  color: var(--link-color);
+}
+
+.missions-agenda-linked {
+  font-size: 0.85em;
+  font-weight: 500;
+  color: var(--link-color);
+  text-decoration: underline;
+  flex-shrink: 0;
+  transform: translate(-24px, 5px);
+}
+
+.missions-agenda-linked:hover {
+  color: var(--interactive-accent);
+}
+
+.missions-agenda-links-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.missions-agenda-links-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 0.85em;
+  font-weight: 500;
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+.missions-agenda-links-btn:hover {
+  color: var(--interactive-accent);
+}
+
+.missions-agenda-links-dropdown {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 0.25em;
+  min-width: 120px;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 100;
+  padding: 0.25em 0;
+}
+
+.missions-agenda-links-dropdown.open {
+  display: flex;
+  flex-direction: column;
+}
+
+.missions-agenda-linked-item {
+  padding: 0.4em 0.75em;
+  font-size: 0.9em;
+  color: var(--link-color);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.missions-agenda-linked-item:hover {
+  background: var(--background-modifier-hover);
+  color: var(--interactive-accent);
+}
+
+.missions-agenda-mission {
+  font-size: 0.8em;
+  color: var(--text-faint);
+  text-decoration: none;
+}
+
+.missions-agenda-mission:hover {
+  color: var(--interactive-accent);
+}
+
+.missions-agenda-empty {
+  font-size: 0.9em;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 0.5em 0;
+}
+
+/* Status section: mission cards with calendar */
+.missions-status-section {
+  margin-top: 3em;
+  margin-bottom: 2em;
+}
+
+.missions-status-title {
+  margin: 0 0 0.75em 0;
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.missions-status-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+  width: 100%;
+}
+
+.missions-status-row {
+  display: flex;
+  gap: 0.8em;
+  width: 100%;
+}
+
+.missions-status-cell {
+  flex: 0 0 calc((100% - 1.6em) / 3);
+  min-width: 0;
+}
+
+.missions-status-card {
+  border: 2px solid var(--interactive-accent);
+  border-radius: 12px;
+  padding: 0.75em 1em;
+  background: var(--background-secondary);
+  text-align: center;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  overflow: hidden;
+}
+
+.missions-status-card .missions-status-cal-range {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  align-self: stretch;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25em;
+  align-content: start;
+}
+
+.missions-status-card:hover {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.missions-status-card-title {
+  margin: 0 0 0.5em 0;
+  font-size: 1.1em;
+}
+
+.missions-status-card-title a {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+.missions-status-card-title a:hover {
+  color: var(--interactive-accent);
+}
+
+/* Whole card as link */
+a.missions-status-card {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+a.missions-status-card .missions-status-card-title {
+  color: var(--link-color);
+}
+
+.missions-status-objective {
+  font-size: 0.8em;
+  color: var(--text-muted);
+  margin-bottom: 0.25em;
+  line-height: 1.2;
+}
+
+.missions-status-timeframe {
+  font-size: 0.75em;
+  color: var(--text-faint);
+  margin-bottom: 0.4em;
+}
+
+.missions-status-cal {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.15em;
+  text-align: center;
+  font-size: 0.7em;
+}
+
+/* Range view: only days from today to end date */
+.missions-status-cal-range {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6em;
+  justify-content: center;
+  align-content: flex-start;
+}
+
+/* Mission file: larger day boxes */
+.missions-status-cal-mission {
+  gap: 0.75em;
+  padding: 1em 0;
+}
+
+.missions-status-cal-mission .missions-status-cal-day {
+  min-width: 6em;
+  min-height: 4.5em;
+  padding: 0.6em 0.5em;
+}
+
+.missions-status-cal-mission .missions-status-cal-day-num {
+  font-size: 1.4em;
+}
+
+.missions-status-cal-mission .missions-status-cal-day-item {
+  font-size: 0.8em;
+}
+
+.missions-status-cal-empty-msg {
+  font-size: 0.8em;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 0.5em 0;
+}
+
+/* Current Week section: Mon-Sun with tasks */
+.missions-week-section {
+  margin-top: 1.25em;
+  margin-bottom: 2em;
+}
+
+.missions-week-title {
+  margin: 0 0 0.75em 0;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.missions-week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.65em;
+}
+
+.missions-week-day-col {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 0.9em;
+  background: var(--background-secondary);
+  min-height: 7em;
+}
+
+.missions-week-day-col.missions-week-day-today {
+  border: 3px solid #8b5cf6 !important;
+}
+
+.missions-week-day-col.missions-week-day-mission {
+  border: 1px solid #8b5cf6 !important;
+}
+
+.missions-week-day-col.missions-week-day-done {
+  background: #22c55e !important;
+  border-color: #22c55e !important;
+  color: white;
+}
+
+.missions-week-day-col.missions-week-day-not-done {
+  background: #b91c1c !important;
+  border-color: #b91c1c !important;
+  color: white;
+}
+
+.missions-week-day-name {
+  font-size: 0.85em;
+  font-weight: 600;
+  margin-bottom: 0.5em;
+}
+
+.missions-week-day-col.missions-week-day-done .missions-week-day-name,
+.missions-week-day-col.missions-week-day-not-done .missions-week-day-name {
+  color: rgba(255,255,255,0.95);
+}
+
+.missions-week-day-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25em;
+}
+
+.missions-week-task {
+  font-size: 0.9em;
+  padding: 0.25em 0.4em;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.missions-week-task-cb {
+  cursor: pointer;
+  flex-shrink: 0;
+  border: 1px solid #8b5cf6 !important;
+  border-radius: 3px;
+}
+
+.missions-week-task-label {
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+}
+
+.missions-week-task-empty {
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+.missions-week-day-col.missions-week-day-done .missions-week-task,
+.missions-week-day-col.missions-week-day-not-done .missions-week-task {
+  color: inherit;
+}
+
+/* Mission Calendar: compact, two per row */
+.missions-profile-section {
+  margin-top: 1.5em;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em 1.5em;
+}
+
+.missions-month-wrap {
+  flex: 1 1 140px;
+  min-width: 140px;
+  max-width: calc(50% - 0.75em);
+}
+
+.missions-month-title {
+  margin: 0 0 0.35em 0;
+  font-size: 0.8em;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.missions-month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.1em;
+  font-size: 0.65em;
+}
+
+.missions-month-dow {
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.6em;
+  color: var(--text-muted);
+  padding: 0.15em 0;
+}
+
+.missions-month-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  min-height: 1.2em;
+}
+
+.missions-month-empty {
+  visibility: hidden;
+}
+
+.missions-month-mission-day {
+  border: 1px solid #8b5cf6 !important;
+}
+
+.missions-month-mission-day.missions-month-done {
+  background: #22c55e !important;
+  color: white;
+}
+
+.missions-month-mission-day.missions-month-not-done {
+  background: #b91c1c !important;
+  color: white;
+}
+
+.missions-month-mission-day.missions-month-today {
+  border: 1px solid #8b5cf6 !important;
+}
+
+.missions-status-cal-dow {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.missions-status-cal-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  border-radius: 8px;
+  min-width: 5em;
+  min-height: 3.5em;
+  padding: 0.5em 0.4em;
+  font-size: 1em;
+  font-weight: 600;
+  background: transparent !important;
+  border: 1px solid #8b5cf6 !important;
+  color: var(--text-normal);
+}
+
+.missions-status-cal-day-num {
+  font-size: 1.15em;
+  margin-bottom: 0.35em;
+}
+
+.missions-status-cal-day-items {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2em;
+  width: 100%;
+}
+
+.missions-status-cal-day-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+  font-size: 0.7em;
+  font-weight: 500;
+}
+
+.missions-status-cal-check {
+  flex-shrink: 0;
+  font-size: 0.9em;
+}
+
+.missions-status-cal-word {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.missions-status-cal-day.missions-status-cal-empty {
+  visibility: hidden;
+}
+
+/* Dashboard compact day boxes: day number only, smaller */
+.missions-status-cal-day-compact {
+  min-width: 2.2em !important;
+  min-height: 2.2em !important;
+  padding: 0.25em !important;
+  font-size: 0.85em !important;
+}
+
+.missions-status-cal-day-compact .missions-status-cal-day-num {
+  margin-bottom: 0;
+  font-size: 1em;
+}
+
+/* Future days: clear with thin purple border */
+.missions-status-cal-day.missions-status-cal-future {
+  background: transparent !important;
+  border: 1px solid #8b5cf6 !important;
+}
+
+.missions-status-cal-day.missions-status-cal-today {
+  border: 3px solid #8b5cf6 !important;
+  background: transparent !important;
+}
+
+.missions-status-cal-day.missions-status-cal-today.missions-status-cal-done {
+  background: #22c55e !important;
+  border: 3px solid #8b5cf6 !important;
+}
+
+.missions-status-cal-day.missions-status-cal-today.missions-status-cal-not-done {
+  background: #b91c1c !important;
+  border: 3px solid #8b5cf6 !important;
+}
+
+.missions-status-cal-day.missions-status-cal-done {
+  background: #22c55e !important;
+  border: 1px solid #22c55e !important;
+  color: white;
+}
+
+.missions-status-cal-day.missions-status-cal-not-done {
+  background: #b91c1c !important;
+  border: 1px solid #b91c1c !important;
+  color: white;
+}
+
+.missions-section {
+  margin-bottom: 2em;
+}
+
+.missions-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.missions-card {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 0.75em 1em;
+  background: var(--background-secondary);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.missions-card:hover {
+  border-color: var(--interactive-accent);
+  background: var(--background-secondary-alt);
+}
+
+.missions-card-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5em;
+  flex-wrap: wrap;
+}
+
+.missions-card-title {
+  font-weight: 600;
+  font-size: 0.95em;
+  text-decoration: none;
+  color: var(--link-color);
+}
+
+.missions-card-title:hover {
+  color: var(--interactive-accent);
+}
+
+.missions-card-meta {
+  font-size: 0.8em;
+  color: var(--text-faint);
+}
+
+.missions-card-objective {
+  font-size: 0.85em;
+  color: var(--text-muted);
+  margin-top: 0.35em;
+}
+
+.missions-daily-checkin {
+  margin-top: 0.6em;
+  padding-top: 0.5em;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.missions-checkin-title {
+  margin: 0 0 0.4em 0;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.missions-targets {
+  margin-top: 0.25em;
+}
+
+.missions-target-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-bottom: 0.35em;
+}
+
+.missions-target-row:last-child {
+  margin-bottom: 0;
+}
+
+.missions-target-checkbox {
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.missions-target-label {
+  cursor: pointer;
+  font-size: 0.9em;
+  flex: 1;
+}
+
+.missions-target-freq {
+  font-size: 0.75em;
+  color: var(--text-faint);
+}
+
+/* Overview card (mission file – objective) */
+.missions-overview-card {
+  margin-bottom: 1.75em;
+  padding: 1.5em 1.75em;
+  background: var(--background-secondary);
+  border: 2px solid var(--background-modifier-border);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.missions-overview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  margin-bottom: 0.75em;
+}
+
+.missions-overview-label {
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.missions-overview-content {
+  font-size: 1.5em;
+  line-height: 1.5;
+  color: var(--text-normal);
+  min-height: 1.5em;
+  outline: none;
+}
+
+.missions-overview-content.empty:before {
+  content: attr(data-placeholder);
+  color: var(--text-faint);
+}
+
+.missions-overview-content:focus {
+  outline: none;
+}
+
+/* Legacy objective input (backward compat) */
+.missions-objective-box-wrap {
+  margin-bottom: 1.75em;
+}
+
+.missions-objective-input {
+  width: 100%;
+  padding: 1.1em 1.35em;
+  font-size: 1.5em;
+  line-height: 1.5;
+  border-radius: 10px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  box-sizing: border-box;
+}
+
+/* Status HQ calendar (mission file) */
+.missions-status-section {
+  margin-bottom: 1.5em;
+}
+
+.missions-status-header-row {
+  display: flex;
+  align-items: center;
+  gap: 1.2em;
+  margin-bottom: 1.5em;
+  font-size: 1.1em;
+  font-weight: 600;
+  overflow: visible;
+}
+
+.missions-status-header-row .missions-status-title {
+  margin: 0;
+}
+
+.missions-new-mission-btn {
+  margin-top: 0.2em;
+  padding: 0.5em 1em;
+  font-size: 1em;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  cursor: pointer;
+}
+
+.missions-new-mission-btn:hover {
+  opacity: 0.9;
+}
+
+.missions-status-btn {
+  margin-top: 0.25em;
+  padding: 0.35em 0.8em;
+  min-width: 7em;
+  font-size: 0.9em;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--interactive-accent);
+  cursor: pointer;
+  text-align: center;
+}
+
+.missions-status-btn:hover {
+  text-decoration: underline;
+}
+
+.missions-status-btn-wrap {
+  position: relative;
+  overflow: visible;
+}
+
+.missions-status-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.missions-status-modal-overlay.open {
+  display: flex;
+}
+
+.missions-status-modal {
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 12px;
+  padding: 1.5em 2em;
+  min-width: 240px;
+  max-width: 320px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.missions-status-modal-title {
+  font-size: 1em;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5em;
+  text-align: center;
+}
+
+.missions-status-modal-divider {
+  border: none;
+  border-top: 1px solid var(--background-modifier-border);
+  margin: 0.25em 0;
+}
+
+.missions-status-modal-btn {
+  padding: 0.6em 1em;
+  font-size: 0.95em;
+  font-weight: 500;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  text-align: center;
+}
+
+.missions-status-modal-btn:hover {
+  background: var(--background-modifier-hover);
+  border-color: var(--interactive-accent);
+}
+
+.missions-status-modal-btn.active {
+  border-color: var(--interactive-accent);
+  color: var(--interactive-accent);
+  font-weight: 600;
+}
+
+.missions-status-modal-btn.missions-modal-scrap:hover {
+  border-color: #c0392b;
+  color: #c0392b;
+}
+
+.missions-status-dropdown {
+  display: none;
+  flex-direction: column;
+  gap: 0.15em;
+  padding: 0.35em;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-primary);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 1000;
+  min-width: 7em;
+  width: max-content;
+}
+
+.missions-status-dropdown.open {
+  display: flex;
+}
+
+.missions-status-option {
+  padding: 0.4em 0.8em;
+  min-width: 7em;
+  width: 100%;
+  font-size: 0.85em;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-normal);
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.missions-status-option:hover {
+  background: var(--background-modifier-hover);
+}
+
+.missions-status-option.active {
+  color: var(--interactive-accent);
+  font-weight: 600;
+}
+
+/* Archive sub-menu (Completed / Scrapped) */
+.missions-status-archive-wrap {
+  position: relative;
+}
+
+.missions-status-archive-sub {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  margin-left: 0.25em;
+  display: none;
+  flex-direction: column;
+  gap: 0.15em;
+  padding: 0.35em;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-primary);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 1001;
+  min-width: 7em;
+  width: max-content;
+}
+
+.missions-status-archive-wrap.open .missions-status-archive-sub {
+  display: flex;
+}
+
+.missions-status-archive-opt {
+  padding: 0.4em 0.8em;
+  min-width: 7em;
+  width: 100%;
+  font-size: 0.85em;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-normal);
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.missions-status-archive-opt:hover {
+  background: var(--background-modifier-hover);
+}
+
+.missions-status-archive-opt-scrap:hover {
+  color: #c0392b;
+}
+
+.missions-status-title {
+  margin: 0 0 0.5em 0;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.missions-status-calendar {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 0.75em;
+  background: var(--background-secondary);
+}
+
+.missions-cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5em;
+}
+
+.missions-cal-title {
+  font-size: 0.95em;
+  font-weight: 600;
+}
+
+.missions-cal-nav {
+  padding: 0.2em 0.5em;
+  font-size: 1.1em;
+  border-radius: 4px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  cursor: pointer;
+}
+
+.missions-cal-nav:hover {
+  background: var(--background-modifier-hover);
+}
+
+.missions-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.2em;
+  text-align: center;
+}
+
+.missions-cal-dow {
+  font-size: 0.7em;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.missions-cal-day {
+  padding: 0.35em;
+  font-size: 0.85em;
+  border-radius: 6px;
+}
+
+.missions-cal-day.missions-cal-empty {
+  visibility: hidden;
+}
+
+.missions-cal-day.missions-cal-today {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  font-weight: 600;
+}
+
+.missions-cal-day.missions-cal-done {
+  background: var(--background-modifier-border);
+}
+
+.missions-cal-day.missions-cal-today.missions-cal-done {
+  background: var(--interactive-accent);
+  opacity: 0.9;
+}
+
+/* Targets section in mission file */
+.missions-targets-section {
+  margin: 1em 0;
+}
+
+.missions-targets-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+  margin-bottom: 0.75em;
+}
+
+.missions-targets-title {
+  margin: 0;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.missions-target-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.missions-target-card {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 0.6em 1em;
+  background: var(--background-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+  flex-wrap: wrap;
+}
+
+.missions-target-card:hover {
+  border-color: var(--background-modifier-border-hover);
+}
+
+.missions-target-card-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  flex-wrap: wrap;
+}
+
+.missions-target-card-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+}
+
+.missions-target-card-item {
+  font-weight: 500;
+  font-size: 0.95em;
+  flex-shrink: 0;
+}
+
+.missions-target-linked {
+  font-size: 0.85em;
+  font-weight: 500;
+  color: var(--link-color);
+  text-decoration: underline;
+  flex-shrink: 0;
+  margin-left: 0.5em;
+  margin-right: 0.25em;
+  align-self: center;
+  line-height: 1.4;
+  padding-top: 0.15em;
+}
+
+.missions-target-linked:hover {
+  color: var(--interactive-accent);
+}
+
+/* Multiple links dropdown in target cards */
+.missions-target-links-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.missions-target-links-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 0.85em;
+  font-weight: 500;
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+.missions-target-links-btn:hover {
+  color: var(--interactive-accent);
+}
+
+.missions-target-links-dropdown {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 0.25em;
+  min-width: 120px;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 100;
+  padding: 0.25em 0;
+}
+
+.missions-target-links-dropdown.open {
+  display: flex;
+  flex-direction: column;
+}
+
+.missions-target-linked-item {
+  padding: 0.4em 0.75em;
+  font-size: 0.9em;
+  color: var(--link-color);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.missions-target-linked-item:hover {
+  background: var(--background-modifier-hover);
+  color: var(--interactive-accent);
+}
+
+.missions-target-card-freq {
+  font-size: 0.8em;
+  color: var(--text-faint);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  background: var(--background-modifier-border);
+  margin-left: 0.5em;
+}
+
+.missions-target-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.missions-target-edit-btn,
+.missions-target-del-btn {
+  padding: 0.25em 0.5em;
+  font-size: 0.8em;
+  border-radius: 4px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  cursor: pointer;
+}
+
+.missions-target-edit-btn:hover {
+  border-color: var(--interactive-accent);
+  color: var(--interactive-accent);
+}
+
+.missions-target-del-btn:hover {
+  border-color: var(--text-error);
+  color: var(--text-error);
+}
+
+.missions-target-empty-msg {
+  font-size: 0.9em;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 0.5em 0;
+}
+
+/* + Add target button (in mission file) */
+.missions-add-target-btn {
+  padding: 0.35em 0.75em;
+  font-size: 0.9em;
+  border-radius: 6px;
+  border: 1px solid var(--interactive-accent);
+  background: var(--background-primary);
+  color: var(--interactive-accent);
+  cursor: pointer;
+}
+
+.missions-add-target-btn:hover {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+/* Add target modal overlay */
+.missions-add-target-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.missions-add-target-modal {
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 1.25em;
+  min-width: 320px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.missions-add-target-modal h4 {
+  margin: 0 0 0.75em 0;
+  font-size: 1em;
+}
+
+.missions-add-target-input {
+  width: 100%;
+  padding: 0.5em;
+  margin-bottom: 0.75em;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary-alt);
+  box-sizing: border-box;
+}
+
+/* Links section in add/edit modal */
+.missions-add-target-links {
+  margin-bottom: 0.75em;
+}
+
+.missions-add-target-links > span {
+  display: block;
+  font-size: 0.85em;
+  color: var(--text-muted);
+  margin-bottom: 0.35em;
+}
+
+.missions-add-target-links-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.missions-add-target-link-row {
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+}
+
+.missions-add-target-link-name {
+  flex: 0 0 100px;
+  padding: 0.4em 0.5em;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary-alt);
+  font-size: 0.9em;
+  box-sizing: border-box;
+}
+
+.missions-add-target-link-url {
+  flex: 1;
+  min-width: 0;
+  padding: 0.4em 0.5em;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary-alt);
+  font-size: 0.9em;
+  box-sizing: border-box;
+}
+
+.missions-add-target-remove-link {
+  flex-shrink: 0;
+  width: 1.8em;
+  height: 1.8em;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: var(--background-modifier-border);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.1em;
+  line-height: 1;
+}
+
+.missions-add-target-remove-link:hover {
+  background: var(--text-error);
+  color: white;
+}
+
+.missions-add-target-add-link {
+  padding: 0.3em 0.6em;
+  font-size: 0.85em;
+  border-radius: 6px;
+  border: 1px dashed var(--background-modifier-border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.missions-add-target-add-link:hover {
+  border-color: var(--interactive-accent);
+  color: var(--interactive-accent);
+}
+
+.missions-add-target-start {
+  margin-bottom: 0.75em;
+}
+
+.missions-add-target-start span {
+  display: block;
+  font-size: 0.85em;
+  color: var(--text-muted);
+  margin-bottom: 0.35em;
+}
+
+.missions-add-target-start-input {
+  width: 100%;
+  padding: 0.5em;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary-alt);
+  box-sizing: border-box;
+}
+
+.missions-add-target-freq {
+  margin-bottom: 0.75em;
+}
+
+.missions-add-target-freq span {
+  display: block;
+  font-size: 0.85em;
+  color: var(--text-muted);
+  margin-bottom: 0.35em;
+}
+
+.missions-add-target-freq button {
+  padding: 0.3em 0.6em;
+  margin-right: 0.35em;
+  margin-bottom: 0.25em;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  cursor: pointer;
+  font-size: 0.85em;
+}
+
+.missions-add-target-freq button:hover,
+.missions-add-target-freq button.active {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+.missions-add-target-custom {
+  margin-bottom: 0.75em;
+}
+
+.missions-add-target-custom span {
+  display: block;
+  font-size: 0.85em;
+  color: var(--text-muted);
+  margin-bottom: 0.35em;
+}
+
+.missions-add-target-days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em;
+}
+
+.missions-add-target-day-btn {
+  padding: 0.3em 0.6em;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  cursor: pointer;
+  font-size: 0.85em;
+}
+
+.missions-add-target-day-btn:hover,
+.missions-add-target-day-btn.active {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+.missions-add-target-custom-input {
+  width: 100%;
+  padding: 0.5em;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary-alt);
+  box-sizing: border-box;
+}
+
+.missions-add-target-actions {
+  display: flex;
+  gap: 0.5em;
+  justify-content: flex-end;
+  margin-top: 1em;
+}
+
+.missions-add-target-actions button {
+  padding: 0.4em 0.8em;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  cursor: pointer;
+}
+
+.missions-add-target-save {
+  background: var(--interactive-accent) !important;
+  color: var(--text-on-accent) !important;
+  border-color: var(--interactive-accent) !important;
+}
+
+.missions-target-row:has(.missions-target-checkbox:checked) .missions-target-label {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.missions-target-empty {
+  font-size: 0.85em;
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+/* Agenda Template: Calendar date picker overlay */
+.agenda-date-picker-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.agenda-date-picker-modal {
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 12px;
+  padding: 1.25em 1.5em;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  min-width: 280px;
+}
+
+.agenda-date-picker-modal h4 {
+  margin: 0 0 1em 0;
+  font-size: 1em;
+  text-align: center;
+}
+
+/* Mission Template: Calendar picker modal */
+.mission-calendar-modal .mission-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1em;
+  gap: 0.5em;
+}
+
+.mission-calendar-modal .mission-calendar-title {
+  font-weight: 600;
+  font-size: 1em;
+}
+
+.mission-calendar-modal .mission-calendar-nav {
+  padding: 0.25em 0.6em;
+  font-size: 1.2em;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  cursor: pointer;
+  color: var(--text-normal);
+}
+
+.mission-calendar-modal .mission-calendar-nav:hover {
+  background: var(--background-modifier-hover);
+  border-color: var(--interactive-accent);
+}
+
+.mission-calendar-modal .mission-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25em;
+  text-align: center;
+}
+
+.mission-calendar-modal .mission-calendar-dow {
+  font-size: 0.75em;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 0.25em 0;
+}
+
+.mission-calendar-modal .mission-calendar-day {
+  min-height: 2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9em;
+}
+
+.mission-calendar-modal .mission-calendar-day-btn {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-primary);
+  cursor: pointer;
+  color: var(--text-normal);
+}
+
+.mission-calendar-modal .mission-calendar-day-btn:hover {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+.mission-calendar-modal .mission-calendar-day-btn.selected {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+  font-weight: 600;
+}
+
+.mission-calendar-modal .mission-calendar-day-btn.past {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.mission-calendar-modal .mission-calendar-empty {
+  visibility: hidden;
+}

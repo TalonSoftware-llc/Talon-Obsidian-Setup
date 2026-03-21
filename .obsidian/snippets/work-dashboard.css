@@ -1,0 +1,195 @@
+/* Work Dashboard: compact overview */
+
+.work-dash {
+  padding: 0.25em 0;
+}
+
+/* Two-card rows */
+.wd-top-row {
+  display: flex;
+  gap: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+/* Big clickable card */
+.wd-big-card {
+  flex: 1 1 0;
+  min-width: 0;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 10px;
+  padding: 0.75em 0.9em;
+  background: var(--background-secondary);
+  text-decoration: none !important;
+  color: var(--text-normal);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+  cursor: pointer;
+}
+
+.wd-big-card:hover {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.wd-big-card-title {
+  font-size: 0.95em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 0.15em;
+}
+
+.wd-big-card-footer {
+  font-size: 0.8em;
+  color: var(--text-faint);
+  margin-top: auto;
+  padding-top: 0.25em;
+}
+
+/* Mini list inside big cards */
+.wd-mini-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+}
+
+.wd-mini-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.wd-mini-name {
+  font-size: 0.88em;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Mini progress ring */
+.wd-mini-ring {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.wd-mini-ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.wd-mini-ring-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55em;
+  font-weight: 700;
+  color: var(--text-normal);
+}
+
+/* Week dots for agenda */
+.wd-week-dots {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.wd-week-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--background-modifier-border);
+}
+
+.wd-week-dot.done { background: #10b981; }
+.wd-week-dot.missed { background: #ef4444; }
+.wd-week-dot.future { background: var(--background-modifier-border); opacity: 0.4; }
+.wd-week-dot.current { box-shadow: 0 0 0 1.5px var(--text-normal); }
+
+/* Agenda today summary */
+.wd-agenda-today {
+  margin-bottom: 0.4em;
+  padding: 0.4em 0.6em;
+  border: 1px solid var(--interactive-accent);
+  border-radius: 6px;
+  background: var(--background-primary);
+}
+
+.wd-agenda-today-label {
+  display: block;
+  font-size: 0.7em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.15em;
+}
+
+.wd-agenda-today-nums {
+  display: block;
+}
+
+.wd-agenda-today-count {
+  font-size: 1.3em;
+  font-weight: 700;
+  color: var(--text-normal);
+}
+
+.wd-agenda-today-pct {
+  font-size: 1em;
+  font-weight: 600;
+  color: var(--interactive-accent);
+}
+
+/* Stat row for Ideas / New */
+.wd-stat-row {
+  display: flex;
+  gap: 1.5em;
+}
+
+.wd-stat { text-align: center; }
+
+.wd-stat-num {
+  font-size: 2em;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.wd-stat-label {
+  font-size: 0.9em;
+  color: var(--text-muted);
+}
+
+/* Today tag */
+.wd-today-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
+  font-size: 0.9em;
+  color: var(--text-normal);
+  margin-top: 0.15em;
+}
+
+.wd-today-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f59e0b;
+  display: inline-block;
+  animation: wd-pulse 2s infinite;
+}
+
+@keyframes wd-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}

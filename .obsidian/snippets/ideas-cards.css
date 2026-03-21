@@ -1,0 +1,2474 @@
+/* Repository tool: New/ (capture) + Data/ (layers & boards) */
+
+/* Remove code block border highlight on hover (Obsidian default) */
+.cm-preview-code-block:hover {
+  border-color: var(--background-modifier-border) !important;
+  box-shadow: none !important;
+}
+
+.ideas-section {
+  margin-bottom: 2.5em;
+}
+
+.ideas-section-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  margin-bottom: 1em;
+  margin-top: 1.5em;
+}
+
+.ideas-section-header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  padding-right: 2.5em;
+}
+
+.ideas-section-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-left: auto;
+  width: 18em;
+  justify-content: flex-end;
+}
+
+.ideas-section-actions .ideas-select-all {
+  flex-shrink: 0;
+  margin-right: 0.25em;
+}
+
+.ideas-section-actions .ideas-btn {
+  min-width: 5.2em;
+  width: 5.2em;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.ideas-select-all {
+  cursor: pointer;
+}
+
+.ideas-header-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em;
+  padding-top: 0.3em;
+  border-top: 1px dashed var(--background-modifier-border);
+}
+
+.ideas-section-title {
+  margin: 0;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+/* Project Resources dataview: one link per row */
+.project-resources-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+  margin-top: 0.35em;
+  line-height: 1.5;
+}
+
+.project-resources-item .internal-link {
+  word-break: break-word;
+}
+
+.ideas-section-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.6em;
+  height: 1.6em;
+  padding: 0 0.4em;
+  border-radius: 50%;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  font-size: 0.8em;
+  font-weight: 600;
+}
+
+.ideas-section:last-of-type {
+  margin-bottom: 0;
+}
+
+.ideas-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+}
+
+.ideas-card {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 0.5em 1em;
+  background: var(--background-secondary);
+  transition: border-color 0.15s ease, background 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
+  min-height: 0;
+}
+
+.ideas-card-checkbox {
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.ideas-card:hover {
+  border-color: var(--interactive-accent);
+  background: var(--background-secondary-alt);
+}
+
+.ideas-card-title {
+  margin: 0;
+  font-size: 0.95em;
+  font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ideas-card-title a.internal-link {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-decoration: none;
+  color: var(--link-color);
+}
+
+.ideas-card-title a.internal-link:hover {
+  color: var(--interactive-accent);
+}
+
+.ideas-card-project {
+  font-size: 0.75em;
+  flex-shrink: 0;
+  max-width: 10em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ideas-card-project a.internal-link {
+  text-decoration: none;
+  color: var(--text-muted);
+}
+
+.ideas-card-project a.internal-link:hover {
+  color: var(--interactive-accent);
+}
+
+.ideas-card-preview {
+  font-size: 0.8em;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 12em;
+  flex-shrink: 0;
+}
+
+.ideas-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em;
+  flex-shrink: 0;
+}
+
+/* Purple/red borders: subtle default, solid + thicker on hover */
+:root {
+  --ideas-accent: #5b21b6;
+  --ideas-accent-faint: rgba(91, 33, 182, 0.5);
+  --ideas-archive: #991b1b;
+  --ideas-archive-faint: rgba(153, 27, 27, 0.5);
+}
+
+.ideas-btn {
+  padding: 0.3em 0.6em;
+  font-size: 0.8em;
+  border-radius: 6px;
+  border: 1px solid var(--ideas-accent-faint);
+  background: var(--background-primary);
+  cursor: pointer;
+  color: var(--text-normal);
+  transition: background 0.15s, border-color 0.15s, border-width 0.15s;
+}
+
+.ideas-btn:hover {
+  background: var(--background-modifier-hover);
+  border: 2px solid var(--ideas-accent);
+}
+
+.ideas-btn-archive {
+  color: var(--text-muted);
+  border-color: var(--ideas-archive-faint);
+}
+
+.ideas-btn-archive:hover {
+  border: 2px solid var(--ideas-archive);
+}
+
+.ideas-btn-develop {
+  border-color: var(--ideas-accent-faint);
+  color: var(--ideas-accent);
+}
+
+.ideas-btn-develop:hover {
+  background: var(--ideas-accent);
+  color: var(--text-on-accent);
+  border: 2px solid var(--ideas-accent);
+}
+
+.ideas-btn-link {
+  border-color: var(--ideas-accent-faint);
+  color: var(--ideas-accent);
+}
+
+.ideas-btn-link:hover {
+  border: 2px solid var(--ideas-accent);
+}
+
+.ideas-btn-final {
+  border-color: var(--ideas-accent-faint);
+  color: var(--ideas-accent);
+}
+
+.ideas-btn-final:hover {
+  background: var(--ideas-accent);
+  color: var(--text-on-accent);
+  border: 2px solid var(--ideas-accent);
+}
+
+.ideas-btn-combine {
+  border-color: var(--ideas-accent-faint);
+  color: var(--ideas-accent);
+}
+
+.ideas-btn-combine:hover {
+  background: var(--ideas-accent);
+  color: var(--text-on-accent);
+  border: 2px solid var(--ideas-accent);
+}
+
+/* Combine button: small, only when 2+ selected */
+.ideas-combine-wrap {
+  display: flex;
+  align-items: center;
+  margin-right: 1em;
+}
+
+.ideas-combine-small {
+  padding: 0.2em 0.4em !important;
+  font-size: 0.75em !important;
+  min-width: auto !important;
+  width: auto !important;
+}
+
+.ideas-picker {
+  width: 100%;
+  flex-basis: 100%;
+  margin-top: 0.4em;
+  padding-top: 0.4em;
+  border-top: 1px dashed var(--background-modifier-border);
+  display: none;
+  flex-wrap: wrap;
+  gap: 0.35em;
+}
+
+.ideas-picker-option {
+  padding: 0.25em 0.5em;
+  font-size: 0.8em;
+  border-radius: 4px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary-alt);
+  cursor: pointer;
+  color: var(--text-normal);
+}
+
+.ideas-picker-option:hover {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+/* Data / repository view: folder tree */
+.ideas-final-tree {
+  margin-top: 0.5em;
+}
+
+.ideas-final-empty {
+  font-style: italic;
+}
+
+.ideas-create-in-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  flex-wrap: wrap;
+}
+
+.ideas-create-in-wrap label {
+  font-size: 0.9em;
+  color: var(--text-muted);
+}
+
+.ideas-create-in-select {
+  flex: 1;
+  min-width: 10em;
+  padding: 0.4em 0.6em;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary-alt);
+  font-size: 0.9em;
+}
+
+.ideas-modal-actions {
+  display: flex;
+  gap: 0.5em;
+}
+
+.ideas-add-btn,
+.ideas-section-actions .ideas-add-btn {
+  min-width: 2em !important;
+  width: 2em !important;
+  padding: 0.25em;
+  font-size: 1.15em;
+  font-weight: 700;
+}
+
+.ideas-add-type-wrap {
+  display: flex;
+  gap: 0.5em;
+}
+
+.ideas-add-type-btn {
+  padding: 0.35em 0.75em;
+  font-size: 0.9em;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  cursor: pointer;
+  color: var(--text-normal);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.ideas-add-type-btn:hover {
+  background: var(--background-modifier-hover);
+  border-color: var(--interactive-accent);
+}
+
+.ideas-add-type-btn.active {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+/* Data view: Move/Delete buttons */
+.ideas-final-action-btn {
+  color: var(--text-muted);
+}
+
+.ideas-final-action-btn.disabled,
+.ideas-final-action-btn:disabled,
+.ideas-section-actions .ideas-btn.disabled,
+.ideas-section-actions .ideas-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.ideas-final-checkbox {
+  margin-right: 0.35em;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.ideas-final-tree .links-tree-folder-header,
+.ideas-final-tree .links-tree-file {
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+}
+
+/* Link modal: 3-column visual selector */
+.ideas-link-modal {
+  width: 560px !important;
+  max-width: 95vw;
+}
+
+.ideas-link-columns {
+  display: flex;
+  gap: 1.25em;
+  margin-top: 0.75em;
+}
+
+.ideas-link-column {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.ideas-link-column-title {
+  margin: 0;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ideas-link-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 0.25em;
+}
+
+.ideas-link-option {
+  padding: 0.5em 0.75em;
+  font-size: 0.9em;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary-alt);
+  cursor: pointer;
+  color: var(--text-normal);
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.ideas-link-option:hover {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+.ideas-link-placeholder {
+  font-size: 0.85em;
+  color: var(--text-faint);
+  font-style: italic;
+  padding: 0.5em 0;
+}
+
+/* Drag-and-drop in Vault tree */
+.ideas-final-tree .links-tree-folder-header[draggable="true"],
+.ideas-final-tree .links-tree-file[draggable="true"] {
+  cursor: grab;
+}
+
+.ideas-final-tree .links-tree-folder-header[draggable="true"]:active,
+.ideas-final-tree .links-tree-file[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.ideas-dragging {
+  opacity: 0.45;
+}
+
+.ideas-drag-over {
+  background: var(--background-modifier-hover) !important;
+  border-radius: 4px;
+  outline: 2px solid var(--text-faint);
+  outline-offset: -1px;
+}
+
+.ideas-drop-root.ideas-drag-over {
+  outline: 2px dashed var(--text-faint);
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+
+.ideas-drag-active .links-tree-folder-header {
+  transition: background 0.1s ease, outline 0.1s ease;
+}
+
+/* ── Repository: unified top bar ── */
+
+.repo-top-bar-unified {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-bottom: 0.6em;
+  padding: 0.5em 0.5em;
+  min-height: 2.5em;
+  line-height: 1;
+  background: var(--background-secondary);
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  flex-wrap: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-sizing: border-box;
+  /* Left toggle & Home height; middle row (Edit / + / ‹ ›) slightly shorter but same tier */
+  --repo-toggle-outer-height: 2.15em;
+  --repo-actions-height: calc(var(--repo-toggle-outer-height) * 0.9);
+}
+
+.repo-top-bar-unified .repo-bar-controls-left,
+.repo-top-bar-unified .repo-bar-repo-actions,
+.repo-top-bar-unified .repo-bar-breadcrumb,
+.repo-top-bar-unified .repo-bar-nav-arrows,
+.repo-top-bar-unified .repo-bar-home-wrap,
+.repo-top-bar-unified .repo-bar-right {
+  line-height: 1;
+}
+
+/* Edit + — right side; margin-left auto pins this + the toggle after breadcrumb */
+.repo-bar-repo-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* Back / Forward — after Home */
+.repo-bar-nav-arrows {
+  display: flex;
+  align-items: center;
+  gap: 0.15em;
+  flex-shrink: 0;
+  margin-left: 0;
+}
+
+/* Home — far left */
+.repo-bar-home-wrap {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: 0;
+}
+
+/* New | Repository toggle — far left */
+.repo-bar-controls-left {
+  display: flex;
+  align-items: center;
+  gap: 0.55em;
+  flex-shrink: 0;
+  flex-grow: 0;
+  white-space: nowrap;
+  margin-left: 0;
+}
+
+.repo-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.15em;
+  flex-shrink: 0;
+  margin-right: 0.35em;
+}
+
+.repo-nav-btn {
+  width: 1.6em;
+  height: 1.6em;
+  padding: 0;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  background: var(--background-primary);
+  cursor: pointer;
+  font-size: 1em;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.repo-nav-btn:hover {
+  color: var(--interactive-accent);
+  border-color: var(--interactive-accent);
+}
+
+.repo-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Breadcrumb / location — strict flex fill: remaining top-bar width only */
+.repo-bar-breadcrumb-zone.repo-bar-breadcrumb {
+  flex: 1 1 0%;
+  min-width: 0;
+  width: 0;
+  max-width: 100%;
+  min-height: 2.35em;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  overflow-x: auto;
+  overflow-y: visible;
+  margin-left: 0.55em;
+  padding: 0.45em 0.65em 0.45em 0.85em;
+  border-left: 1px solid var(--background-modifier-border);
+  box-sizing: border-box;
+}
+
+.repo-bar-breadcrumb-zone.repo-bar-breadcrumb-hidden {
+  visibility: hidden;
+  pointer-events: none;
+  border-left-color: transparent;
+}
+
+.repo-breadcrumb-inline {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.repo-breadcrumb-inline .repo-breadcrumb {
+  justify-content: flex-start;
+  align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.repo-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
+  flex-shrink: 0;
+  flex-grow: 0;
+  justify-content: flex-end;
+}
+
+.repo-top-add {
+  flex-shrink: 0;
+  padding: 0.2em 0.45em;
+  font-size: 0.9em;
+}
+
+.repo-top-edit {
+  padding: 0.2em 0.5em;
+  font-size: 0.85em;
+}
+
+.repo-top-edit.repo-top-edit-static {
+  min-width: 5em;
+  width: 5em;
+  max-width: 5em;
+  flex-shrink: 0;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* Smaller than toggle & Home; Edit / + / ‹ › share one height tier */
+.repo-top-bar-unified .repo-bar-repo-actions .repo-top-edit,
+.repo-top-bar-unified .repo-bar-repo-actions .repo-top-add {
+  box-sizing: border-box;
+  height: var(--repo-actions-height);
+  min-height: var(--repo-actions-height);
+  max-height: var(--repo-actions-height);
+  padding: 0 0.4em;
+  font-size: 0.74em;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.repo-top-bar-unified .repo-bar-nav-arrows .repo-nav-btn {
+  width: var(--repo-actions-height);
+  height: var(--repo-actions-height);
+  min-width: var(--repo-actions-height);
+  box-sizing: border-box;
+  font-size: 0.92em;
+}
+
+.repo-top-bar-unified .repo-bar-home-wrap .repo-nav-btn.repo-nav-home {
+  width: var(--repo-toggle-outer-height);
+  height: var(--repo-toggle-outer-height);
+  min-width: var(--repo-toggle-outer-height);
+  box-sizing: border-box;
+  flex-shrink: 0;
+  border-radius: 4px;
+  font-size: 1.05em;
+}
+
+.repo-slider-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.15em;
+  padding: 0.15em;
+  margin-left: 0;
+  background: var(--background-primary);
+  border-radius: 4px;
+  border: 1px solid var(--background-modifier-border);
+}
+
+.repo-top-bar-unified .repo-slider-inner {
+  min-height: var(--repo-toggle-outer-height);
+  box-sizing: border-box;
+}
+
+.repo-slider-btn {
+  padding: 0.25em 0.6em;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.8em;
+  color: var(--text-muted);
+  transition: background 0.15s, color 0.15s;
+}
+
+.repo-slider-btn:hover {
+  color: var(--text-normal);
+  background: var(--background-modifier-hover);
+}
+
+.repo-slider-btn.active {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+.ideas-create-tile-select {
+  margin-left: 0.5em;
+  padding: 0.35em 0.6em;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  font-size: 0.9em;
+}
+
+/* Move to board modal */
+.ideas-move-tile-wrap {
+  margin-top: 1em;
+  margin-bottom: 1.5em;
+}
+
+.ideas-move-tile-wrap .ideas-move-tile-select {
+  display: block;
+  width: 100%;
+  margin-left: 0;
+  margin-top: 0.35em;
+  padding: 0.5em 0.75em;
+  font-size: 0.9em;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+}
+
+.ideas-move-btn-row {
+  display: flex;
+  gap: 0.75em;
+  margin-top: 1.25em;
+  padding-top: 1em;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.ideas-btn.active {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+/* ── Repository vault: nav bar (breadcrumb wrapper) ── */
+
+.repo-nav-bar {
+  background: var(--background-secondary);
+  border-radius: 8px;
+  padding: 0.6em 1em;
+  margin-bottom: 1em;
+  border: 1px solid var(--background-modifier-border);
+}
+
+.repo-top-bar-unified .repo-nav-bar {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  border-radius: 0;
+}
+
+.repo-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 0;
+  font-size: 0.85em;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.repo-breadcrumb.repo-breadcrumb-three {
+  align-items: stretch;
+  gap: 0.25em;
+  padding: 0;
+  flex-wrap: nowrap;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: visible;
+}
+
+.repo-breadcrumb-three .repo-breadcrumb-sep {
+  flex-shrink: 0;
+  align-self: center;
+  font-size: 1.1em;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--text-muted);
+  opacity: 0.85;
+  padding: 0 0.08em;
+}
+
+/* Three equal columns per row */
+.repo-breadcrumb-layer-col {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 100%;
+  display: flex;
+  align-items: stretch;
+}
+
+/* Layer chips: squared; fill column */
+.repo-breadcrumb-layer-cell {
+  font-size: 0.9em;
+  font-weight: 300;
+  font-synthesis: none;
+  padding: 0.35em 0.5em;
+  border-radius: 0;
+  border: 1px solid transparent;
+  background: color-mix(in srgb, var(--background-secondary) 90%, white);
+  line-height: 1.25;
+  text-align: center;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+
+.repo-breadcrumb-layer-filled.repo-breadcrumb-layer-cell {
+  background: color-mix(in srgb, var(--background-secondary) 84%, white);
+}
+
+.repo-breadcrumb-layer-cell:hover {
+  border-color: color-mix(in srgb, var(--text-muted) 32%, var(--background-modifier-border));
+  background: color-mix(in srgb, var(--background-secondary) 76%, white);
+}
+
+.repo-breadcrumb-layer-empty.repo-breadcrumb-layer-cell {
+  color: var(--text-faint);
+  opacity: 0.75;
+  min-width: 1.25em;
+}
+
+/* Lighter than body default; accent color (Edit-style), not heavy */
+.repo-breadcrumb-three .repo-breadcrumb-layer-cell.repo-breadcrumb-clickable {
+  color: color-mix(in srgb, var(--ideas-accent) 88%, var(--text-normal));
+  font-weight: 300;
+  font-synthesis: none;
+  padding: 0.35em 0.5em;
+}
+
+.repo-breadcrumb-three .repo-breadcrumb-layer-cell.repo-breadcrumb-clickable:hover {
+  color: color-mix(in srgb, var(--ideas-accent) 92%, var(--text-normal));
+  background: color-mix(in srgb, var(--background-secondary) 72%, white);
+  border-color: color-mix(in srgb, var(--text-muted) 32%, var(--background-modifier-border));
+}
+
+.repo-breadcrumb::-webkit-scrollbar {
+  height: 4px;
+}
+
+.repo-breadcrumb-lead {
+  cursor: pointer;
+  color: var(--text-muted);
+  margin-right: 0.15em;
+  border-radius: 3px;
+  padding: 0.05em 0.15em;
+  transition: color 0.15s, background 0.15s;
+}
+
+.repo-breadcrumb-lead:hover {
+  color: var(--interactive-accent);
+  background: var(--background-modifier-hover);
+}
+
+.repo-breadcrumb-sep {
+  color: var(--text-faint);
+  margin: 0 0.1em;
+  user-select: none;
+}
+
+.repo-breadcrumb-clickable {
+  cursor: pointer;
+  color: var(--text-muted);
+  border-radius: 3px;
+  padding: 0.05em 0.2em;
+  transition: color 0.15s, background 0.15s;
+}
+
+.repo-breadcrumb-clickable:hover {
+  color: var(--interactive-accent);
+  background: var(--background-modifier-hover);
+}
+
+.repo-breadcrumb .repo-breadcrumb-segment:last-child {
+  color: var(--text-normal);
+  font-weight: 600;
+  cursor: default;
+}
+
+.repo-breadcrumb .repo-breadcrumb-segment:last-child:hover {
+  background: none;
+  color: var(--text-normal);
+}
+
+/* ── Repository vault: board header (+ and Edit) ── */
+
+.repo-board-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-bottom: 1em;
+}
+
+/* ── Repository vault: edit controls row ── */
+
+.repo-board-edit-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-bottom: 0.75em;
+  padding: 0.4em 0.6em;
+  background: var(--background-secondary);
+  border-radius: 6px;
+}
+
+/* ── Repository vault: layer grid (folder navigation, not board tiles) ── */
+
+.repo-layer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75em;
+}
+
+@media (max-width: 720px) {
+  .repo-layer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .repo-layer-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.repo-layer-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  width: 100%;
+  min-height: 0;
+  aspect-ratio: 1 / 1;
+  box-sizing: border-box;
+  padding: 0.85em 0.65em;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 0;
+  background: var(--background-secondary);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: center;
+  overflow: auto;
+}
+
+.repo-layer-card:hover {
+  border-color: var(--interactive-accent);
+  background: var(--background-secondary-alt);
+}
+
+.repo-layer-name {
+  font-size: 1em;
+  font-weight: 600;
+  color: var(--text-normal);
+  max-width: 100%;
+  word-break: break-word;
+}
+
+.repo-layer-count {
+  font-size: 0.8em;
+  color: var(--text-muted);
+}
+
+.repo-layer-empty {
+  font-size: 0.9em;
+  color: var(--text-faint);
+  font-style: italic;
+  padding: 1em 0;
+}
+
+/* ── Repository board: tiles (note lists / future embeds) ── */
+
+/*
+ * Repository board: avoid overflow-x:hidden + overflow-y:visible — in CSS, y becomes `auto`
+ * and a 1–2px subpixel overflow shows a useless mini scrollbar. Use hidden on y too when
+ * height is content-driven, or clip without scrollbars.
+ */
+.repo-view-repository {
+  overflow-x: hidden;
+  overflow-y: hidden;
+  max-width: 100%;
+  min-height: min(92vh, 2400px);
+}
+
+.repo-board-wrap {
+  transition: background 0.2s ease;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+/* Edit mode: canvas slightly below pane chrome — darker than the old 88%white lift */
+.repo-board-wrap.repo-board-edit-mode {
+  background: color-mix(in srgb, var(--background-primary) 94%, black);
+  border-radius: 10px;
+  padding: 0.3em 0.25em;
+  margin: 0;
+}
+
+/* Edit mode: subtle lift vs canvas */
+.repo-board-edit-mode .repo-board-tile-box {
+  background: color-mix(in srgb, var(--repo-tile-bg, var(--repo-tile-surface-default)) 96%, white);
+  border-color: color-mix(in srgb, var(--repo-tile-border, var(--repo-tile-border-default)) 92%, white);
+}
+
+/* Note rows use .repo-board-tile-item styles below (gray cards), not a flat tile tint */
+
+/* Canvas: full width of the board area, no side padding — tiles can sit flush to edges */
+.repo-board-content.repo-board-canvas {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  box-sizing: border-box;
+  padding: 0;
+  min-height: min(88vh, 2200px);
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+.repo-board-wrap.repo-board-edit-mode .repo-board-content.repo-board-canvas {
+  overflow-x: hidden;
+  overflow-y: hidden;
+  min-height: min(90vh, 2400px);
+  /* Dashed frame; slightly lighter than wrap (~4% white on the darkened primary) */
+  border: 2px dashed color-mix(in srgb, var(--background-modifier-border) 65%, white);
+  border-radius: 10px;
+  background: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--background-primary) 94%, black) 96%,
+    white
+  );
+  box-sizing: border-box;
+}
+
+.repo-board-tile-placeholder {
+  border: 2px dashed var(--interactive-accent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--interactive-accent) 15%, transparent);
+  position: absolute;
+  pointer-events: none;
+}
+
+/* Must stay position:absolute (left/top from JS). Do not use position:relative here — it overrides absolute and puts boxes in document flow so resizing one shifts others. */
+.repo-board-tile-box {
+  /*
+   * Default board palette (no custom tile props): charcoal tile, slate note, white text.
+   * Tile #323234 · border #444446 · note #42424a · note border solid medium gray
+   */
+  --repo-tile-surface-default: #323234;
+  --repo-tile-border-default: #444446;
+  --repo-tile-text-default: #ffffff;
+  --repo-tile-note-bg-default: #42424a;
+  --repo-tile-note-border-default: #5c5c66;
+  --repo-tile-note-text-default: #ffffff;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  box-sizing: border-box;
+  min-width: 180px;
+  border: var(--repo-tile-border-w, 1px) solid var(--repo-tile-border, var(--repo-tile-border-default));
+  border-radius: 12px;
+  background: var(--repo-tile-bg, var(--repo-tile-surface-default));
+  color: var(--repo-tile-text, var(--repo-tile-text-default));
+  /* Title / note text sizes use --repo-tile-title-scale and --repo-tile-note-scale on child elements */
+  font-size: 1rem;
+  padding: 0.35em 0.75em 0.45em;
+  overflow: hidden;
+  z-index: 1;
+  transition: border-width 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, outline 0.12s ease;
+}
+
+/* Inset outline/shadow so tiles can sit flush with canvas (no outer glow clipped by overflow:hidden) */
+.repo-board-edit-mode .repo-board-tile-box.repo-board-tile-selected {
+  outline: 3px solid color-mix(in srgb, var(--interactive-accent) 72%, white);
+  outline-offset: -3px;
+  z-index: 3;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--interactive-accent) 35%, transparent);
+}
+
+/* No inset box-shadow on hover — it read as a gray “inner border” inside the tile */
+.repo-board-edit-mode .repo-board-tile-box:hover:not(.repo-board-tile-selected) {
+  box-shadow: none;
+  background: color-mix(in srgb, var(--repo-tile-bg, var(--repo-tile-surface-default)) 92%, white);
+}
+
+.repo-board-edit-mode .repo-board-tile-box.repo-board-tile-border-near:hover:not(.repo-board-tile-selected) {
+  box-shadow: none;
+  background: color-mix(in srgb, var(--repo-tile-bg, var(--repo-tile-surface-default)) 88%, white);
+}
+
+.repo-board-edit-mode .repo-board-tile-box.repo-board-tile-selected:hover {
+  box-shadow: none;
+  background: color-mix(in srgb, var(--repo-tile-bg, var(--repo-tile-surface-default)) 92%, white);
+}
+
+.repo-board-tile-box.repo-board-tile-resizing {
+  outline: 2px dashed var(--interactive-accent);
+  outline-offset: -1px;
+}
+
+.repo-board-tile-box.repo-board-tile-making-space {
+  transition: left 0.2s ease, top 0.2s ease;
+}
+
+.repo-board-tile-ghost {
+  transition: none !important;
+  user-select: none;
+}
+
+.repo-board-tile-ghost .repo-board-resize-handle {
+  display: none !important;
+}
+
+/* Corner resize handles - only visible in edit mode (light gray chips) */
+.repo-board-resize-handle {
+  display: none;
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  z-index: 10;
+  cursor: nwse-resize;
+  background: #c4c4cc;
+  border-radius: 3px;
+  opacity: 0.92;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.repo-board-edit-mode .repo-board-resize-handle {
+  display: block;
+}
+
+.repo-board-resize-handle:hover {
+  opacity: 1;
+  background: #d8d8e0;
+}
+
+.repo-board-resize-nw { top: 4px; left: 4px; cursor: nwse-resize; }
+.repo-board-resize-ne { top: 4px; right: 4px; cursor: nesw-resize; }
+.repo-board-resize-sw { bottom: 4px; left: 4px; cursor: nesw-resize; }
+.repo-board-resize-se { bottom: 4px; right: 4px; cursor: nwse-resize; }
+
+.repo-board-tile-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35em;
+  flex-shrink: 0;
+  margin-bottom: 0.32em;
+  line-height: 1.2;
+  /* Base size for title + ⚙ button (scales with --repo-tile-title-scale) */
+  font-size: calc(0.9rem * var(--repo-tile-title-scale, 1));
+}
+
+/* Inset from corner resize zones: NW (left) and NE + ⚙ (right) */
+.repo-board-edit-mode .repo-board-tile-title-row {
+  padding-left: 1.5em;
+  padding-right: 1.1em;
+  box-sizing: border-box;
+}
+
+.repo-board-tile-title-row .repo-board-tile-title {
+  font-size: 1em;
+  font-weight: var(--repo-tile-title-weight, 600);
+  font-style: var(--repo-tile-title-style, normal);
+  letter-spacing: var(--repo-tile-title-tracking, normal);
+  color: var(--repo-tile-text, var(--repo-tile-text-default));
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Tile actions (⋯): view mode only; scales with title row like ⚙ */
+.repo-board-tile-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.65em;
+  height: 1.65em;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1em;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.repo-board-tile-action-btn:hover {
+  color: var(--interactive-accent);
+  border-color: var(--interactive-accent);
+}
+
+.repo-board-edit-mode .repo-board-tile-action-btn {
+  display: none !important;
+}
+
+.repo-board-tile-props-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  /* em = title-row font size so ⚙ scales with header text */
+  width: 1.65em;
+  height: 1.65em;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1em;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.repo-board-tile-props-btn:hover {
+  color: var(--interactive-accent);
+  border-color: var(--interactive-accent);
+}
+
+.repo-board-edit-mode .repo-board-tile-selected .repo-board-tile-props-btn {
+  display: inline-flex;
+}
+
+.repo-board-tile-list {
+  font-size: 1rem;
+}
+
+/* Embedded single-note preview: body text scales with note slider */
+.repo-board-tile-embed-wrap {
+  font-size: calc(1rem * var(--repo-tile-note-scale, 1));
+}
+
+.repo-board-edit-mode .repo-board-tile-box.repo-board-tile-dropzone {
+  cursor: grab;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+.repo-board-edit-mode .repo-board-tile-box.repo-board-tile-dropzone:active {
+  cursor: grabbing;
+}
+
+.repo-board-tile-box.repo-board-drag-over {
+  background: var(--background-modifier-hover);
+  box-shadow: inset 0 0 0 3px var(--interactive-accent);
+}
+
+.repo-board-tile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45em;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  /* Keeps first note’s top border / radius off the tile’s clip edge */
+  padding-top: 0.15em;
+  box-sizing: border-box;
+}
+
+/* Each note: lighter slate than tile; solid border; hover = same bg, lighter + thicker border only */
+.repo-board-tile-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: calc(0.9rem * var(--repo-tile-note-scale, 1));
+  border-radius: 8px;
+  padding: 0.3em 0.5em;
+  margin: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--repo-tile-note-border, var(--repo-tile-note-border-default));
+  background: var(--repo-tile-note-bg, var(--repo-tile-note-bg-default));
+  cursor: pointer;
+  transition: border-color 0.15s ease, border-width 0.12s ease, margin 0.12s ease, box-shadow 0.12s ease;
+}
+
+/* Hover: slightly lighter border + 2px weight; no lift, no purple, no bg change */
+.repo-board-tile-item:hover {
+  border-width: 2px;
+  border-color: color-mix(
+    in srgb,
+    var(--repo-tile-note-border, var(--repo-tile-note-border-default)) 72%,
+    white
+  );
+  margin: -1px;
+  box-shadow: none;
+}
+
+.repo-board-tile-item.repo-board-item-edit {
+  cursor: grab;
+}
+
+.repo-board-edit-mode .repo-board-tile-item.repo-board-item-edit:hover {
+  border-width: 2px;
+  border-color: color-mix(
+    in srgb,
+    var(--repo-tile-note-border, var(--repo-tile-note-border-default)) 72%,
+    white
+  );
+  margin: -1px;
+  background: var(--repo-tile-note-bg, var(--repo-tile-note-bg-default));
+  box-shadow: none;
+  transform: none;
+}
+
+.repo-board-tile-item.repo-board-item-dragging {
+  opacity: 0.45;
+  cursor: grabbing;
+  transform: none;
+  box-shadow: none;
+}
+
+.repo-board-tile-item a.internal-link {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-decoration: none;
+  color: var(--repo-tile-note-text, var(--repo-tile-note-text-default));
+}
+
+.repo-board-tile-item:hover a.internal-link {
+  color: var(--repo-tile-note-text, var(--repo-tile-note-text-default));
+}
+
+.repo-board-edit-mode .repo-board-tile-item.repo-board-item-edit:hover a.internal-link {
+  color: var(--repo-tile-note-text, var(--repo-tile-note-text-default));
+}
+
+.repo-board-tile-item.repo-board-item-edit a.internal-link {
+  pointer-events: none;
+  cursor: default;
+}
+
+/* ── Repository: create modal (+ on board) ── */
+
+.repo-create-modal {
+  min-width: min(520px, 96vw);
+  max-width: 96vw;
+}
+
+.repo-create-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  flex-wrap: wrap;
+  margin-bottom: 0.75em;
+}
+
+.repo-create-title {
+  font-size: 1.05em;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.repo-create-mode-toggle {
+  display: flex;
+  gap: 0.35em;
+  flex-shrink: 0;
+}
+
+.repo-create-name {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 0.5em;
+}
+
+.repo-create-tile-section,
+.repo-create-note-section {
+  margin-top: 0.5em;
+}
+
+.repo-create-subtype-row {
+  display: flex;
+  gap: 0.35em;
+  flex-wrap: wrap;
+  margin-bottom: 0.65em;
+}
+
+.repo-create-label {
+  display: block;
+  font-size: 0.85em;
+  color: var(--text-muted);
+  margin-bottom: 0.35em;
+}
+
+.repo-create-fullwidth {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.repo-create-group-opts,
+.repo-create-single-opts {
+  margin-top: 0.35em;
+}
+
+.repo-create-summary {
+  font-size: 0.8em;
+  color: var(--text-muted);
+  margin-top: 0.35em;
+}
+
+.repo-create-actions {
+  margin-top: 1em;
+}
+
+/* Picker: columns per tile */
+.repo-picker-modal-wide {
+  min-width: min(720px, 96vw);
+  max-width: 96vw;
+}
+
+.repo-picker-title {
+  margin-bottom: 0.5em;
+}
+
+.repo-picker-columns {
+  display: flex;
+  flex-direction: row;
+  gap: 0.75em;
+  overflow-x: auto;
+  max-height: min(50vh, 420px);
+  padding-bottom: 0.5em;
+  margin: 0.5em 0;
+}
+
+.repo-picker-col {
+  flex: 0 0 200px;
+  min-width: 160px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-secondary);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.repo-picker-col-title {
+  font-size: 0.8em;
+  font-weight: 600;
+  padding: 0.5em 0.65em;
+  background: color-mix(in srgb, var(--background-secondary) 80%, var(--text-muted));
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.repo-picker-note-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
+  width: 100%;
+  text-align: left;
+  padding: 0.35em 0.5em;
+  border: none;
+  border-bottom: 1px solid var(--background-modifier-border);
+  background: transparent;
+  color: var(--text-normal);
+  font-size: 0.8em;
+  cursor: pointer;
+}
+
+.repo-picker-note-row:hover {
+  background: var(--background-modifier-hover);
+}
+
+.repo-picker-note-row-selected {
+  background: color-mix(in srgb, var(--interactive-accent) 18%, transparent);
+}
+
+.repo-picker-check {
+  flex-shrink: 0;
+  width: 1.1em;
+  color: var(--interactive-accent);
+  font-weight: 700;
+}
+
+.repo-picker-note-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.repo-picker-empty {
+  font-size: 0.75em;
+  color: var(--text-faint);
+  padding: 0.5em;
+}
+
+.repo-picker-actions {
+  margin-top: 0.75em;
+  padding-top: 0.75em;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+/* Single-note tile embed */
+.repo-board-tile-box-note {
+  min-height: 200px;
+}
+
+.repo-board-tile-embed-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  margin: 0 -0.25em;
+  padding: 0 0.25em;
+}
+
+.repo-board-tile-embed {
+  font-size: 0.88em;
+  line-height: 1.45;
+  color: var(--repo-tile-note-text, var(--repo-tile-note-text-default));
+}
+
+/* Embedded note body: default white to match board palette (theme preview can override link colors) */
+.repo-board-tile-box .repo-board-tile-embed.markdown-preview-view {
+  color: var(--repo-tile-note-text, var(--repo-tile-note-text-default)) !important;
+}
+
+.repo-board-tile-box .repo-board-tile-embed.markdown-preview-view p,
+.repo-board-tile-box .repo-board-tile-embed.markdown-preview-view li,
+.repo-board-tile-box .repo-board-tile-embed.markdown-preview-view h1,
+.repo-board-tile-box .repo-board-tile-embed.markdown-preview-view h2,
+.repo-board-tile-box .repo-board-tile-embed.markdown-preview-view h3,
+.repo-board-tile-box .repo-board-tile-embed.markdown-preview-view h4,
+.repo-board-tile-box .repo-board-tile-embed.markdown-preview-view h5,
+.repo-board-tile-box .repo-board-tile-embed.markdown-preview-view h6 {
+  color: inherit !important;
+}
+
+.repo-board-tile-box .repo-board-tile-embed.markdown-preview-view a {
+  color: var(--repo-tile-note-text, var(--repo-tile-note-text-default)) !important;
+}
+
+/*
+ * Tile image scale: must beat theme .markdown-preview-view img { max-width: 100% } etc.
+ * Using width + max-width together so scale < 1 shrinks and scale > 1 can grow (embed-wrap scrolls).
+ */
+.repo-board-tile-box .repo-board-tile-embed.markdown-preview-view img,
+.repo-board-tile-box .repo-board-tile-embed img {
+  width: calc(100% * var(--repo-tile-img-scale, 1)) !important;
+  max-width: calc(100% * var(--repo-tile-img-scale, 1)) !important;
+  height: auto !important;
+  box-sizing: border-box !important;
+  border-radius: 4px;
+}
+
+.repo-board-tile-box .repo-board-tile-embed.markdown-preview-view video,
+.repo-board-tile-box .repo-board-tile-embed video {
+  width: calc(100% * var(--repo-tile-img-scale, 1)) !important;
+  max-width: calc(100% * var(--repo-tile-img-scale, 1)) !important;
+  height: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* Tile properties modal — body scrolls; footer is separate (no overlap / bleed-through) */
+.repo-tile-props-modal.links-search-modal {
+  max-width: min(520px, 96vw);
+  width: min(520px, 96vw);
+  max-height: min(85vh, calc(100vh - 2rem));
+  max-height: min(85vh, calc(100dvh - 2rem));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+  margin: auto;
+}
+
+.repo-tile-props-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.repo-tile-props-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65em;
+  flex-wrap: wrap;
+  margin-bottom: 0.65em;
+}
+
+.repo-tile-props-header-row .repo-tile-props-title {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  font-size: 1em;
+}
+
+.repo-tile-props-restore-header {
+  font-size: 0.72em !important;
+  padding: 0.28em 0.55em !important;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.repo-tile-props-panel-title {
+  font-size: 0.68em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 0.5em;
+}
+
+.repo-tile-props-title {
+  margin-top: 0;
+  margin-bottom: 0.75em;
+}
+
+.repo-tile-props-scope-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  flex-wrap: wrap;
+  margin-bottom: 1em;
+}
+
+.repo-tile-props-scope-row .repo-tile-props-label {
+  margin-bottom: 0;
+}
+
+.repo-tile-props-scope-btn {
+  border-radius: 8px !important;
+  padding: 0.4em 0.85em !important;
+}
+
+.repo-tile-props-scope-btn.active {
+  border-color: var(--interactive-accent) !important;
+  background: color-mix(in srgb, var(--interactive-accent) 22%, var(--background-primary));
+  color: var(--text-normal);
+  font-weight: 600;
+}
+
+.repo-tile-props-tile-extras,
+.repo-tile-props-content-extras {
+  margin-bottom: 1em;
+}
+
+.repo-tile-props-tile-extras .repo-tile-props-panel-title + .repo-tile-props-label,
+.repo-tile-props-content-extras .repo-tile-props-panel-title + .repo-tile-props-label {
+  margin-top: 0;
+}
+
+.repo-tile-props-select {
+  font-size: 0.85em;
+  padding: 0.35em 0.5em;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  color: var(--text-normal);
+}
+
+.repo-tile-props-fullwidth {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.repo-tile-props-section {
+  margin-bottom: 1.1em;
+}
+
+.repo-tile-props-label {
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.35em;
+}
+
+/* HSV color picker (tabs + SV plane + hue strip + hex) */
+.repo-tile-props-color-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em;
+  margin-bottom: 0.45em;
+}
+
+.repo-tile-props-color-tab {
+  padding: 0.35em 0.65em;
+  font-size: 0.82em;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.repo-tile-props-color-tab:hover {
+  border-color: var(--interactive-accent);
+  color: var(--text-normal);
+}
+
+.repo-tile-props-color-tab-active {
+  border-color: var(--interactive-accent);
+  background: color-mix(in srgb, var(--interactive-accent) 22%, var(--background-primary));
+  color: var(--text-normal);
+  font-weight: 600;
+}
+
+.repo-tile-props-picker-wrap {
+  display: flex;
+  align-items: stretch;
+  gap: 0.65em;
+  margin-bottom: 0.65em;
+  user-select: none;
+}
+
+.repo-tile-props-sv {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+  max-height: 220px;
+  border-radius: 8px;
+  border: 1px solid var(--background-modifier-border);
+  cursor: crosshair;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+.repo-tile-props-sv-inner {
+  position: absolute;
+  inset: 0;
+  border-radius: 7px;
+  background:
+    linear-gradient(to bottom, transparent, #000),
+    linear-gradient(to right, #fff, var(--repo-sv-hue, #f00));
+}
+
+.repo-tile-props-sv-handle {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45), 0 1px 4px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.repo-tile-props-hue {
+  position: relative;
+  width: 22px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  border: 1px solid var(--background-modifier-border);
+  cursor: ns-resize;
+  background: linear-gradient(
+    to bottom,
+    hsl(0, 100%, 50%),
+    hsl(60, 100%, 50%),
+    hsl(120, 100%, 50%),
+    hsl(180, 100%, 50%),
+    hsl(240, 100%, 50%),
+    hsl(300, 100%, 50%),
+    hsl(360, 100%, 50%)
+  );
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+.repo-tile-props-hue-handle {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: calc(100% + 8px);
+  height: 12px;
+  transform: translate(-50%, -50%);
+  border: 2px solid #fff;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  z-index: 2;
+  box-sizing: border-box;
+}
+
+.repo-tile-props-hex-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.repo-tile-props-hex-label {
+  font-size: 0.8em;
+  color: var(--text-muted);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.repo-tile-props-hex-input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-monospace-theme, ui-monospace, monospace);
+  font-size: 0.85em;
+  padding: 0.35em 0.5em;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  color: var(--text-normal);
+  box-sizing: border-box;
+}
+
+.repo-tile-props-hex-input:focus {
+  outline: none;
+  border-color: var(--interactive-accent);
+}
+
+.repo-tile-props-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65em;
+}
+
+.repo-tile-props-range-wide {
+  flex: 1;
+  min-width: 0;
+}
+
+.repo-tile-props-val {
+  font-size: 0.85em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  min-width: 2.5em;
+}
+
+.repo-tile-props-mode-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+  margin-bottom: 0.5em;
+}
+
+.repo-tile-props-radio {
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
+  font-size: 0.88em;
+  cursor: pointer;
+}
+
+.repo-tile-props-link-list {
+  max-height: 12em;
+  overflow-y: auto;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  padding: 0.35em 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.repo-tile-props-link-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.25em 0;
+  font-size: 0.88em;
+  cursor: pointer;
+}
+
+.repo-tile-props-link-name {
+  flex: 1;
+  min-width: 0;
+}
+
+.repo-tile-props-selall {
+  font-size: 0.8em !important;
+}
+
+.repo-tile-props-actions {
+  flex-shrink: 0;
+  margin-top: 0;
+  padding-top: 0.75em;
+  padding-bottom: 0.15em;
+  border-top: 1px solid var(--background-modifier-border);
+  flex-wrap: wrap;
+  align-items: center;
+  align-self: stretch;
+  background: var(--background-primary);
+}
+
+.repo-tile-props-delete:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.repo-board-tile-embed-error {
+  font-size: 0.85em;
+  color: var(--text-muted);
+  padding: 0.5em 0;
+}
+
+/* Link/search modals (project-cards): stacking + center in viewport (don’t clip tall dialogs) */
+body .links-search-overlay {
+  z-index: 100000 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: max(0.75rem, env(safe-area-inset-top, 0px)) max(0.75rem, env(safe-area-inset-right, 0px)) max(0.75rem, env(safe-area-inset-bottom, 0px)) max(0.75rem, env(safe-area-inset-left, 0px)) !important;
+  box-sizing: border-box !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.links-search-modal {
+  position: relative;
+  z-index: 1;
+}
+
+/* Tile actions: hugs the cloned card width + footer */
+.repo-tile-actions-modal.links-search-modal {
+  width: max-content;
+  max-width: calc(100vw - 2rem);
+  max-height: min(92vh, calc(100vh - 2rem));
+  max-height: min(92vh, calc(100dvh - 2rem));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+  margin: auto;
+  padding: 0.55rem 0.65rem 0.65rem;
+}
+
+/* Link picker: fixed panel — width +25% vs previous 520px square; height unchanged */
+.repo-link-tree-modal.links-search-modal {
+  --repo-link-modal-h: min(520px, calc(100vh - 2rem), calc(100dvh - 2rem));
+  --repo-link-modal-w: min(650px, calc(100vw - 2rem));
+  width: var(--repo-link-modal-w);
+  height: var(--repo-link-modal-h);
+  max-width: var(--repo-link-modal-w);
+  max-height: var(--repo-link-modal-h);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+  margin: auto;
+  padding: 1rem 1.1rem;
+  flex-shrink: 0;
+}
+
+.repo-link-tree-header {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-bottom: 0.5em;
+}
+
+.repo-link-tree-title {
+  margin: 0;
+  font-size: 1.05em;
+}
+
+.repo-tile-actions-body {
+  flex: 0 1 auto;
+  min-height: 0;
+  width: max-content;
+  max-width: 100%;
+  overflow: visible;
+}
+
+/* Live tile clone in “Tile actions” (same classes as board; not position:absolute) */
+.repo-tile-actions-tile-host {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  max-width: 100%;
+  max-height: min(calc(92vh - 5.5rem), 720px);
+  overflow: auto;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.repo-tile-actions-tile-scale {
+  flex-shrink: 0;
+}
+
+.repo-board-tile-box.repo-tile-actions-tile-clone {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.repo-tile-actions-tile-clone .repo-board-tile-title-row {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.repo-tile-actions-tile-clone .repo-board-tile-item.repo-tile-actions-selectable {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.45em;
+  cursor: pointer;
+}
+
+.repo-tile-actions-tile-clone .repo-tile-actions-note-cb {
+  flex-shrink: 0;
+}
+
+/* Don’t navigate away from the modal when previewing embedded note links */
+.repo-tile-actions-tile-clone .markdown-preview-view a {
+  pointer-events: none;
+  cursor: default;
+}
+
+.repo-tile-actions-empty,
+.repo-link-tree-empty {
+  font-size: 0.88em;
+  color: var(--text-muted);
+  padding: 0.35em 0;
+}
+
+.repo-tile-actions-footer {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45em;
+  margin-top: 0.55em;
+  padding-top: 0.45em;
+  border-top: 1px solid var(--background-modifier-border);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.repo-tile-actions-selall {
+  margin: 0;
+}
+
+/* Link modal: scroll area + visual tree (nested columns + stems) */
+.repo-link-picker-stack.repo-link-tree-viz {
+  --repo-tree-line: color-mix(in srgb, var(--text-muted) 75%, var(--background-primary));
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 0.5em;
+  padding: 0.35em 0.25em 0.5em;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.repo-link-tree-root {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.repo-link-tree-root-flat {
+  gap: 0;
+  position: relative;
+  overflow: visible;
+}
+
+/* SVG overlay: orthogonal lines (parent bottom-center → H → child top-centers) */
+.repo-link-tree-svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 0;
+  color: var(--repo-tree-line);
+  shape-rendering: geometricPrecision;
+}
+
+.repo-link-tree-svg-line {
+  stroke: currentColor;
+  stroke-width: 2px;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+}
+
+/* Spacer between rows — lines drawn by SVG above */
+.repo-link-tree-inter-stem-wrap {
+  width: 100%;
+  height: 6px;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.repo-link-tree-inter-stem {
+  display: none;
+}
+
+.repo-link-tree-row-root,
+.repo-link-tree-row:not(.repo-link-tree-row--layer),
+.repo-link-tree-flat-layer {
+  position: relative;
+  z-index: 1;
+}
+
+.repo-link-tree-flat-layer {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.repo-link-tree-flat-layer-notes {
+  padding-top: 0.25em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Top “primary” layer: chips centered in the modal content area */
+.repo-link-tree-row-primary {
+  width: 100%;
+  justify-content: center;
+  padding: 0.35em 0 0.45em;
+  box-sizing: border-box;
+}
+
+.repo-link-tree-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.45em 0.55em;
+}
+
+.repo-link-tree-row-root {
+  justify-content: center;
+  width: 100%;
+  flex-wrap: nowrap;
+  gap: 0.45em 0.55em;
+  position: relative;
+  z-index: 0;
+}
+
+.repo-link-tree-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Vertical stem from parent chip */
+.repo-link-tree-stem {
+  width: 2px;
+  height: 14px;
+  flex-shrink: 0;
+  background: var(--repo-tree-line);
+  border-radius: 1px;
+}
+
+/* Only child: one vertical segment (no T-junction) */
+.repo-link-tree-stem--single {
+  height: 16px;
+}
+
+.repo-link-tree-stem--short {
+  height: 10px;
+}
+
+/* Branch area (nested tree — flat layers use .repo-link-tree-branch-wrap-flat) */
+.repo-link-tree-branch-wrap {
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: max-content;
+  max-width: min(100%, 92vw);
+  box-sizing: border-box;
+}
+
+/* Flat modal layers: must win over .repo-link-tree-branch-wrap (full width + centered chip rows) */
+.repo-link-tree-branch-wrap.repo-link-tree-branch-wrap-flat {
+  width: 100%;
+  max-width: 100%;
+  align-items: stretch;
+  box-sizing: border-box;
+}
+
+.repo-link-tree-branch-wrap.repo-link-tree-branch-wrap-flat > .repo-link-tree-row {
+  width: 100%;
+  max-width: 100%;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* Wired sub-layers: measured H-bar + stubs up from each chip (incl. single-child rows) */
+.repo-link-tree-branch-wrap--layer {
+  position: relative;
+  padding-top: 0;
+}
+
+.repo-link-tree-hline {
+  display: none;
+}
+
+/* Room below SVG junction so chips sit under the horizontal segment */
+.repo-link-tree-row--layer {
+  position: relative;
+  z-index: 1;
+  padding-top: 6px;
+  width: 100%;
+  max-width: 100%;
+  justify-content: center;
+  align-items: flex-start;
+  box-sizing: border-box;
+}
+
+.repo-link-tree-row--multi.repo-link-tree-row--layer {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+}
+
+.repo-link-tree-branch-wrap--single {
+  padding-top: 0;
+}
+
+.repo-link-tree-col--child {
+  position: relative;
+  padding-top: 0;
+}
+
+.repo-link-tree-branch-wrap--layer .repo-link-tree-col--child {
+  padding-top: 0;
+}
+
+.repo-link-tree-branch-wrap--layer .repo-link-tree-col--child::before {
+  display: none;
+}
+
+.repo-link-tree-branch-wrap--empty {
+  padding-top: 0;
+}
+
+.repo-link-tree-col--leaf {
+  align-items: stretch;
+}
+
+.repo-link-picker-notes--tree {
+  min-width: min(280px, 85vw);
+  max-width: min(420px, 92vw);
+}
+
+.repo-link-picker-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45em;
+  align-items: center;
+}
+
+.repo-link-picker-chip {
+  border-radius: 8px;
+  padding: 0.42em 0.8em;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 0.88em;
+  cursor: pointer;
+  line-height: 1.25;
+  max-width: 100%;
+  word-break: break-word;
+}
+
+.repo-link-picker-chip:hover:not(.is-disabled) {
+  border-color: var(--interactive-accent);
+  color: var(--text-normal);
+}
+
+.repo-link-picker-chip.is-active {
+  border-color: var(--interactive-accent);
+  background: color-mix(in srgb, var(--interactive-accent) 18%, var(--background-primary));
+  font-weight: 600;
+}
+
+.repo-link-picker-chip.is-disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+/* Tile layer: equal squares; --repo-tile-size = max natural side (set in JS) */
+.repo-link-tree-branch-wrap--tiles .repo-link-picker-chip--tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.25;
+  font-size: 0.88em;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  box-sizing: border-box;
+  padding: 0.5em 0.65em;
+  width: var(--repo-tile-size, max-content);
+  height: var(--repo-tile-size, auto);
+  max-width: min(18rem, 90vw);
+  min-width: 2.75em;
+  min-height: 2.75em;
+  aspect-ratio: 1;
+}
+
+.repo-link-tree-branch-wrap--tiles.repo-link-tree-tiles--equalized .repo-link-picker-chip--tile {
+  max-width: none;
+}
+
+.repo-link-picker-notes {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 0.5em 0.6em;
+  background: var(--background-secondary);
+  max-height: min(48vh, 440px);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Row 1: first note + “Select all” share one grid row — same height (no extra strip → scrollbar) */
+.repo-link-picker-notes-inner {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 0.5em;
+  row-gap: 0.4em;
+  align-items: stretch;
+  padding: 0;
+}
+
+.repo-link-picker-notes-header {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+  align-self: stretch;
+  min-width: 0;
+}
+
+.repo-link-picker-selall {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  height: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+  font-size: 0.68em;
+  padding: 0.12em 0.42em;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.repo-link-picker-notes-inner > .repo-link-picker-note-row:first-of-type {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: stretch;
+}
+
+.repo-link-picker-notes-inner > .repo-link-picker-note-row:not(:first-of-type) {
+  grid-column: 1 / -1;
+}
+
+.repo-link-picker-notes-inner > .repo-link-tree-empty {
+  grid-column: 1 / -1;
+}
+
+.repo-link-picker-note-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+  font-size: 0.86em;
+  cursor: pointer;
+}
+
+.repo-link-picker-note-link {
+  flex: 1;
+  min-width: 0;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--text-muted) 55%, transparent);
+  text-underline-offset: 2px;
+}
+
+.repo-link-tree-footer {
+  flex-shrink: 0;
+  margin-top: auto;
+  padding-top: 0.5em;
+}
+
+.repo-create-name-field .repo-create-label {
+  margin-bottom: 0.35em;
+}
+
+.repo-create-name-field .repo-create-name {
+  pointer-events: auto;
+  user-select: text;
+}

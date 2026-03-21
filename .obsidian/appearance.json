@@ -1,0 +1,10 @@
+{
+  "enabledCssSnippets": [
+    "agenda-cards",
+    "ideas-cards",
+    "plus-cards",
+    "project-cards",
+    "status-buttons",
+    "work-dashboard"
+  ]
+}
