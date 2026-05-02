@@ -6,9 +6,8 @@ const app = this.app;
 const container = (typeof this.container !== "undefined" ? this.container : dv.container);
 /** Capture + developing-tag notes for the Repository tool (all tool data under `Data/`). */
 const REPO_INCOMING = "Data/Tools/Repository/New";
-/** Boards + layer folders — vault-root `Data/`. `Data/Tools/` is tool metadata and is hidden from this navigation. */
+/** Boards + layer folders — vault-root `Data/` (includes `Tools/` for tool data). */
 const REPO_DATA = "Data";
-const REPO_DATA_HIDDEN_TOP = new Set(["Tools"]);
 const ARCHIVE_FOLDER = "z_archive/Repository";
 /** Old Developing folders — notes are migrated into `REPO_INCOMING` and tagged `developing`. */
 const LEGACY_DEVELOPING_FOLDERS = [
@@ -135,7 +134,38 @@ function getSelectedPaths(cardsEl) {
     .map(cb => cb.dataset.path).filter(Boolean);
 }
 
-function createSection(title, folderPath, pages, parentEl, tagAction) {
+/** Quick-create a note in a folder (used by top-bar + on New; same behavior as former section +). */
+function showNewNoteModalForFolder(folderPath) {
+  const overlay = document.body.createEl("div", { cls: "links-search-overlay" });
+  const modal = overlay.createEl("div", { cls: "links-search-modal" });
+  modal.createEl("h4", { text: "New" });
+  const input = modal.createEl("input", { cls: "links-search-input", type: "text", placeholder: "Name..." });
+  const btnRow = modal.createEl("div", { cls: "ideas-modal-actions", style: "margin-top:0.75em;display:flex;gap:0.5em" });
+  const cancelBtn = btnRow.createEl("button", { cls: "ideas-btn", text: "Cancel" });
+  const createBtn = btnRow.createEl("button", { cls: "ideas-btn ideas-btn-final", text: "Create" });
+  cancelBtn.addEventListener("click", () => overlay.remove());
+  createBtn.addEventListener("click", async () => {
+    const name = input.value.trim();
+    if (!name) { new Notice("Enter a name"); return; }
+    const safe = (name.replace(/[/\\?%*:|"<>]/g, "-").trim() || "Untitled") + ".md";
+    const newPath = folderPath + "/" + safe;
+    if (app.vault.getAbstractFileByPath(newPath)) { new Notice("Note already exists"); return; }
+    await ensureFolder(folderPath);
+    await app.vault.create(newPath, "---\n---\n\n");
+    overlay.remove();
+    new Notice("Created");
+    const file = app.vault.getAbstractFileByPath(newPath);
+    if (file) await app.workspace.getLeaf().openFile(file);
+    location.reload();
+  });
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter") createBtn.click(); });
+  focusModalTextInput(input);
+}
+
+function createSection(title, folderPath, pages, parentEl, tagAction, sectionOpts) {
+  sectionOpts = sectionOpts || {};
+  const showAddButton = sectionOpts.showAddButton !== false;
   const block = parentEl.createEl("div", { cls: "ideas-section" });
   const sorted = Array.isArray(pages) ? [...pages].sort(byDate) : [];
 
@@ -147,7 +177,11 @@ function createSection(title, folderPath, pages, parentEl, tagAction) {
   const headerActions = headerRow.createEl("div", { cls: "ideas-section-actions" });
 
   const selectAll = headerActions.createEl("input", { type: "checkbox", cls: "ideas-select-all", title: "Select all" });
-  const addBtn = headerActions.createEl("button", { type: "button", text: "+", cls: "ideas-btn ideas-btn-final ideas-add-btn" });
+  let addBtn = null;
+  if (showAddButton) {
+    addBtn = headerActions.createEl("button", { type: "button", text: "+", cls: "ideas-btn ideas-btn-final ideas-add-btn" });
+    addBtn.addEventListener("click", () => showNewNoteModalForFolder(folderPath));
+  }
   const moveBtn = headerActions.createEl("button", { type: "button", text: "Move", cls: "ideas-btn ideas-btn-link" });
   const archiveBtn = headerActions.createEl("button", { type: "button", text: "Archive", cls: "ideas-btn ideas-btn-archive" });
   let markBtn = null;
@@ -171,34 +205,6 @@ function createSection(title, folderPath, pages, parentEl, tagAction) {
       markBtn.classList.toggle("disabled", disabled);
     }
   }
-
-  addBtn.addEventListener("click", async () => {
-    const overlay = document.body.createEl("div", { cls: "links-search-overlay" });
-    const modal = overlay.createEl("div", { cls: "links-search-modal" });
-    modal.createEl("h4", { text: "New" });
-    const input = modal.createEl("input", { cls: "links-search-input", type: "text", placeholder: "Name..." });
-    const btnRow = modal.createEl("div", { cls: "ideas-modal-actions", style: "margin-top:0.75em;display:flex;gap:0.5em" });
-    const cancelBtn = btnRow.createEl("button", { cls: "ideas-btn", text: "Cancel" });
-    const createBtn = btnRow.createEl("button", { cls: "ideas-btn ideas-btn-final", text: "Create" });
-    cancelBtn.addEventListener("click", () => overlay.remove());
-    createBtn.addEventListener("click", async () => {
-      const name = input.value.trim();
-      if (!name) { new Notice("Enter a name"); return; }
-      const safe = (name.replace(/[/\\?%*:|"<>]/g, "-").trim() || "Untitled") + ".md";
-      const newPath = folderPath + "/" + safe;
-      if (app.vault.getAbstractFileByPath(newPath)) { new Notice("Note already exists"); return; }
-      await ensureFolder(folderPath);
-      await app.vault.create(newPath, "---\n---\n\n");
-      overlay.remove();
-      new Notice("Created");
-      const file = app.vault.getAbstractFileByPath(newPath);
-      if (file) await app.workspace.getLeaf().openFile(file);
-      location.reload();
-    });
-    overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
-    input.addEventListener("keydown", (e) => { if (e.key === "Enter") createBtn.click(); });
-    focusModalTextInput(input);
-  });
 
   moveBtn.addEventListener("click", () => {
     const paths = getSelectedPaths(cards);
@@ -293,20 +299,13 @@ function normalizeVaultPath(path) {
 }
 
 /**
- * Subfolders for navigation. Under `Data/`, hide `Tools` only when other folders exist
- * so "content" layers stay visible; if `Data` only contains `Tools`, show it (otherwise the grid is empty).
+ * Subfolders for navigation. Under `Data/`, list every top-level folder (including `Tools`).
  */
 function getSubfolders(folderPath) {
   const norm = normalizeVaultPath(folderPath);
   const folder = app.vault.getAbstractFileByPath(norm);
   if (!folder || !folder.children) return [];
-  let children = folder.children.filter(c => !c.extension && !c.name.startsWith("."));
-  if (norm === REPO_DATA) {
-    const hasSibling = children.some(c => !REPO_DATA_HIDDEN_TOP.has(c.name));
-    if (hasSibling) {
-      children = children.filter(c => !REPO_DATA_HIDDEN_TOP.has(c.name));
-    }
-  }
+  const children = folder.children.filter(c => !c.extension && !c.name.startsWith("."));
   return children.sort((a, b) => a.name.localeCompare(b.name));
 }
 
@@ -320,12 +319,95 @@ function parseYamlDashList(yaml, key) {
   return m[1].split("\n").map(l => l.replace(/^\s+-\s+/, "").replace(/^["']|["']$/g, "").trim()).filter(Boolean);
 }
 
-function getMdFiles(folderPath) {
+function isBoardPdfFile(file) {
+  return file && String(file.extension || "").toLowerCase() === "pdf";
+}
+
+/** Display stem for markdown or PDF rows on boards (strip .md / .pdf). */
+function displayStemForBoardFile(file) {
+  return (file.name || "").replace(/\.(md|pdf)$/i, "");
+}
+
+/** Open in the active leaf only (avoids Obsidian’s default PDF behavior of opening in a split). */
+async function openVaultFileInActiveLeaf(filePath) {
+  const file = app.vault.getAbstractFileByPath(filePath);
+  if (!file) return;
+  const leaf = app.workspace.getLeaf(false);
+  await leaf.openFile(file);
+}
+
+function getBoardRootFiles(folderPath) {
   const folder = app.vault.getAbstractFileByPath(normalizeVaultPath(folderPath));
   if (!folder || !folder.children) return [];
   return folder.children
-    .filter(c => c.extension === "md" && c.name !== BOARD_CONFIG_FILE)
+    .filter((c) => {
+      const ext = String(c.extension || "").toLowerCase();
+      if (ext === "md") return c.name !== BOARD_CONFIG_FILE;
+      if (ext === "pdf") return true;
+      return false;
+    })
     .sort((a, b) => (b.stat?.mtime || 0) - (a.stat?.mtime || 0));
+}
+
+/** Markdown + PDF under a folder tree (for boards); excludes `_board.md`. */
+function walkBoardAssetFilesRecursive(folderPath) {
+  const folder = app.vault.getAbstractFileByPath(folderPath);
+  if (!folder || !folder.children) return [];
+  const out = [];
+  for (const c of folder.children) {
+    const ext = String(c.extension || "").toLowerCase();
+    if (ext === "md" && c.name !== BOARD_CONFIG_FILE) out.push(c);
+    else if (ext === "pdf") out.push(c);
+    else if (!c.extension && !c.name.startsWith(".")) out.push(...walkBoardAssetFilesRecursive(c.path));
+  }
+  return out;
+}
+
+/** Path of a file relative to the board folder (e.g. `Note.md` or `Folder/a.md`). */
+function relPathFromBoardRoot(folderPath, filePath) {
+  const norm = normalizeVaultPath(folderPath).replace(/\/$/, "");
+  if (!filePath || !filePath.startsWith(norm + "/")) return "";
+  return filePath.slice(norm.length + 1);
+}
+
+/**
+ * Work Repository — board subfolders that contain at least one .md (recursive) become automatic group tiles.
+ */
+function listAutoFolderTileNames(folderPath) {
+  const norm = normalizeVaultPath(folderPath);
+  const subs = getSubfolders(norm);
+  const names = [];
+  for (const sub of subs) {
+    const assets = walkBoardAssetFilesRecursive(sub.path);
+    if (assets.length > 0) names.push(sub.name);
+  }
+  return names.sort((a, b) => a.localeCompare(b));
+}
+
+/** Root-level .md/.pdf plus every .md/.pdf under direct subfolders of the board (recursive). */
+function collectBoardMarkdownFiles(folderPath) {
+  const rootFiles = getBoardRootFiles(folderPath);
+  const norm = normalizeVaultPath(folderPath);
+  const subs = getSubfolders(norm);
+  const nestedFiles = [];
+  const seen = new Set(rootFiles.map((f) => f.path));
+  for (const sub of subs) {
+    for (const f of walkBoardAssetFilesRecursive(sub.path)) {
+      if (!seen.has(f.path)) {
+        seen.add(f.path);
+        nestedFiles.push(f);
+      }
+    }
+  }
+  return { rootFiles, nestedFiles, allFiles: rootFiles.concat(nestedFiles) };
+}
+
+function effectiveBoardTileForFile(filePath, folderPath) {
+  const rel = relPathFromBoardRoot(folderPath, filePath);
+  if (rel && rel.includes("/")) {
+    return rel.split("/")[0];
+  }
+  return getFileTile(filePath) || null;
 }
 
 function parseTileConfigYaml(yaml) {
@@ -437,7 +519,8 @@ function openTilePropertiesModal(opts) {
     tilesList,
     tileConfigSnapshot,
     getSizes,
-    onDone
+    onDone,
+    autoFolderTileNames
   } = opts;
   const defaults = {
     bg: "", textColor: "", borderColor: "",
@@ -758,7 +841,9 @@ function openTilePropertiesModal(opts) {
       const cb = row.createEl("input", { type: "checkbox", attr: { value: rel } });
       cb.checked = cur.linkMode === "all" || relSet.has(rel);
       checkboxes.push({ cb, rel });
-      row.createEl("span", { cls: "repo-tile-props-link-name", text: (f.name || "").replace(/\.md$/, "") });
+      const nm = row.createEl("span", { cls: "repo-tile-props-link-name" });
+      nm.appendText(displayStemForBoardFile(f));
+      if (isBoardPdfFile(f)) nm.appendChild(nm.ownerDocument.createElement("span")).classList.add("repo-board-file-kind"); /* patched below */
     }
     const selAllBtn = linkSec.createEl("button", { type: "button", cls: "ideas-btn ideas-btn-link repo-tile-props-selall", text: "Select all" });
     selAllBtn.addEventListener("click", () => {
@@ -815,6 +900,11 @@ function openTilePropertiesModal(opts) {
     attr: { title: tileKey === "__ungrouped__" ? "The Ungrouped tile can’t be removed from the board." : "Remove this tile from the board" }
   });
   if (tileKey === "__ungrouped__") deleteBtn.disabled = true;
+  const autoNames = Array.isArray(autoFolderTileNames) ? autoFolderTileNames : [];
+  if (autoNames.some((n) => String(n).toLowerCase() === String(tileKey).toLowerCase())) {
+    deleteBtn.disabled = true;
+    deleteBtn.title = "This tile comes from a folder inside the board. Remove or empty the folder to drop it.";
+  }
 
   cancelBtn.addEventListener("click", () => overlay.remove());
   overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
@@ -1007,9 +1097,21 @@ function getFileTile(filePath) {
   } catch (e) { return null; }
 }
 
-/** Match note `tile` frontmatter to a board tile name (handles case; __ungrouped__ vs empty). */
-function tileNameMatchesBoard(assignedTile, tileNameFromBoard) {
+/**
+ * Match note to a board tile. Root notes use `tile` frontmatter; notes inside a board subfolder
+ * belong to the auto tile named after that folder (Work Repository).
+ * Optional `filePath` + `folderPath` enable subfolder grouping.
+ */
+function tileNameMatchesBoard(assignedTile, tileNameFromBoard, filePath, folderPath) {
   const UNGROUPED = "__ungrouped__";
+  if (folderPath && filePath) {
+    const rel = relPathFromBoardRoot(folderPath, filePath);
+    if (rel && rel.includes("/")) {
+      const firstSeg = rel.split("/")[0];
+      if (tileNameFromBoard === UNGROUPED) return false;
+      return firstSeg.toLowerCase() === String(tileNameFromBoard).toLowerCase();
+    }
+  }
   const a = (assignedTile || "").trim();
   const t = tileNameFromBoard;
   if (t === UNGROUPED) {
@@ -1098,105 +1200,568 @@ function applyRepoTileVisualProps(box, p) {
   box.style.setProperty("--repo-tile-img-scale", String(!isNaN(im) ? im : 1));
 }
 
-async function showMoveToBoardModal(paths, onSuccess) {
-  const overlay = document.body.createEl("div", { cls: "links-search-overlay" });
-  const modal = overlay.createEl("div", { cls: "links-search-modal", style: "min-width:320px;max-width:420px" });
-  modal.createEl("h4", { text: "Move to board" });
-  const breadcrumbEl = modal.createEl("div", { cls: "ideas-move-breadcrumb", style: "font-size:0.85em;color:var(--text-muted);margin:0.5em 0;min-height:1.2em" });
-  const contentEl = modal.createEl("div", { cls: "ideas-move-content", style: "min-height:120px;margin:0.75em 0 1em 0" });
-  const tileWrap = modal.createEl("div", { cls: "ideas-move-tile-wrap", style: "display:none" });
-  const tileLabel = tileWrap.createEl("label", { text: "Tile", style: "font-size:0.9em;display:block;margin-bottom:0.35em;color:var(--text-muted)" });
-  const tileSelect = tileWrap.createEl("select", { cls: "ideas-move-tile-select" });
-  const btnRow = modal.createEl("div", { cls: "ideas-move-btn-row" });
-  const moveBtn = btnRow.createEl("button", { type: "button", text: "Move here", cls: "ideas-btn ideas-btn-final", disabled: true });
+function appendRepoChipLabel(btn, text) {
+  btn.empty();
+  btn.createEl("span", { cls: "repo-link-picker-chip-label", text });
+}
 
-  let navPath = [];
-  let selectedTile = null;
-  const UNGROUPED = "__ungrouped__";
+/** Shrink label font until it fits the chip’s fixed box (folder chips only). Tile chips use CSS size — no shrink-to-fit. */
+function fitRepoLinkTreeChipLabels(container) {
+  if (!container?.querySelectorAll) return;
+  container.querySelectorAll(".repo-link-picker-chip").forEach((chip) => {
+    if (chip.classList.contains("repo-link-picker-chip--tile")) return;
+    const label = chip.querySelector(".repo-link-picker-chip-label");
+    if (!label || !chip.isConnected) return;
+    const cs = getComputedStyle(chip);
+    const padX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+    const padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+    const availW = chip.clientWidth - padX;
+    const availH = chip.clientHeight - padY;
+    if (availW < 2 || availH < 2) return;
+    if (label.scrollWidth <= availW && label.scrollHeight <= availH) return;
+    label.style.removeProperty("font-size");
+    let fs = parseFloat(getComputedStyle(label).fontSize) || 14;
+    const minFs = 7;
+    for (let i = 0; i < 80; i++) {
+      if (label.scrollWidth <= availW && label.scrollHeight <= availH) break;
+      fs -= 0.5;
+      if (fs < minFs) {
+        label.style.fontSize = minFs + "px";
+        break;
+      }
+      label.style.fontSize = fs + "px";
+    }
+  });
+}
 
-  function buildPath() {
-    let p = REPO_DATA;
-    for (const seg of navPath) p += "/" + seg;
-    return normalizeVaultPath(p);
+/**
+ * Horizontal center of chip group in a branch row (full-width flex rows need chip bounds, not row box center).
+ */
+function repoLinkTreeRowChipCenterX(root, row) {
+  if (!row) return null;
+  const rr = root.getBoundingClientRect();
+  /** Avoid `:scope` in querySelector — can return no matches in some embedded Chromium builds. */
+  const chips = [];
+  for (let i = 0; i < row.children.length; i++) {
+    const col = row.children[i];
+    if (!col.classList.contains("repo-link-tree-col")) continue;
+    const chip = col.querySelector(".repo-link-picker-chip");
+    if (chip) chips.push(chip);
+  }
+  if (chips.length === 0) return null;
+  if (chips.length === 1) {
+    const cr = chips[0].getBoundingClientRect();
+    return cr.left + cr.width / 2 - rr.left;
+  }
+  let minL = Infinity;
+  let maxR = -Infinity;
+  chips.forEach((c) => {
+    const r = c.getBoundingClientRect();
+    minL = Math.min(minL, r.left);
+    maxR = Math.max(maxR, r.right);
+  });
+  return (minL + maxR) / 2 - rr.left;
+}
+
+/**
+ * Position each sublayer chip group under the selected parent.
+ * Uses margin-left on a width:max-content wrapper — full-width rows with justify-content:center
+ * cannot be aligned with translate on an outer 100% box (chips stay viewport-centered).
+ */
+function positionRepoLinkTreeSublayerShifts(root) {
+  if (!root || !root.isConnected) return;
+  root.querySelectorAll(".repo-link-tree-sublayer-shift").forEach((shift) => {
+    shift.style.marginLeft = "0";
+  });
+  void root.offsetWidth;
+  root.querySelectorAll(".repo-link-tree-sublayer-shift").forEach((shift) => {
+    const depth = shift.dataset.repoDepth;
+    let active = null;
+    if (depth === "2") {
+      active = root.querySelector(".repo-link-tree-layer-depth--1 .repo-link-picker-chip.is-active");
+    } else if (depth === "3") {
+      active = root.querySelector(".repo-link-tree-layer-depth--2 .repo-link-picker-chip.is-active");
+    } else if (depth === "4") {
+      active = root.querySelector(".repo-link-tree-layer-depth--3 .repo-link-picker-chip.is-active");
+    } else if (depth === "5") {
+      active = root.querySelector(".repo-link-tree-layer-depth--4 .repo-link-picker-chip--tile.is-active");
+    }
+    let row = shift.querySelector(".repo-link-tree-branch-wrap--layer .repo-link-tree-row--layer");
+    if (!row) row = shift.querySelector(".repo-link-tree-branch-wrap--layer .repo-link-tree-row");
+    const notesEl = shift.querySelector(".repo-link-picker-notes--tree, .repo-link-picker-notes");
+    let childCenter = null;
+    if (notesEl && depth === "5") {
+      const nr = notesEl.getBoundingClientRect();
+      const rr = root.getBoundingClientRect();
+      if (nr.width > 0) childCenter = nr.left + nr.width / 2 - rr.left;
+    } else {
+      childCenter = repoLinkTreeRowChipCenterX(root, row);
+    }
+    const rr = root.getBoundingClientRect();
+    if (!active || childCenter == null) {
+      shift.style.marginLeft = "";
+      return;
+    }
+    const ar = active.getBoundingClientRect();
+    const parentCenter = ar.left + ar.width / 2 - rr.left;
+    let ml = Math.round(parentCenter - childCenter);
+    shift.style.marginLeft = ml + "px";
+    void shift.offsetWidth;
+    const sr = shift.getBoundingClientRect();
+    const rr2 = root.getBoundingClientRect();
+    const pad = 4;
+    if (sr.left < rr2.left + pad) {
+      ml += Math.ceil(rr2.left + pad - sr.left);
+      shift.style.marginLeft = ml + "px";
+    }
+  });
+}
+
+/**
+ * Shared Repository file tree: static layers (no transform / resize layout loops). Click only updates state + refresh.
+ * Tile row = manual `_board.md` tiles + folder-as-group tiles (`listAutoFolderTileNames`, same as the board).
+ * `link`: optional notes row. `move`: stops at tile — board path + tile/group only.
+ * @param {"link"|"move"} mode
+ * @param {{ onAfterRefresh?: () => void }} hooks
+ */
+function createRepoFileTreeController(stack, mode, hooks) {
+  hooks = hooks || {};
+  const onAfterRefresh = hooks.onAfterRefresh;
+  const selectedTargets = new Set();
+  const state = {
+    base: null,
+    secondary: null,
+    tertiary: null,
+    tileDisplayName: null
+  };
+
+  function togglePath(p, checked) {
+    if (checked) selectedTargets.add(p);
+    else selectedTargets.delete(p);
   }
 
-  function renderBreadcrumb() {
-    breadcrumbEl.empty();
-    const lead = breadcrumbEl.createEl("span", { cls: "repo-breadcrumb-lead repo-breadcrumb-clickable", text: "Repository" });
-    lead.addEventListener("click", () => { navPath = []; selectedTile = null; tileWrap.style.display = "none"; render(); });
-    for (let i = 0; i < navPath.length; i++) {
-      breadcrumbEl.createEl("span", { cls: "repo-breadcrumb-sep", text: " › " });
-      const seg = breadcrumbEl.createEl("span", { cls: "repo-breadcrumb-segment repo-breadcrumb-clickable", text: navPath[i] });
-      const idx = i;
-      seg.addEventListener("click", () => { navPath = navPath.slice(0, idx + 1); selectedTile = null; tileWrap.style.display = "none"; render(); });
+  function renderNotesRow(container, boardPath, tileDisplayName, tc) {
+    const { allFiles } = collectBoardMarkdownFiles(boardPath);
+    const files = allFiles;
+    const ftMap = new Map();
+    for (const f of files) ftMap.set(f.path, effectiveBoardTileForFile(f.path, boardPath));
+    let noteFiles = files.filter((f) => tileNameMatchesBoard(ftMap.get(f.path), tileDisplayName, f.path, boardPath));
+    if (tc && tc.kind === "note" && tc.file) {
+      const one = boardPath + "/" + tc.file;
+      const f = app.vault.getAbstractFileByPath(one);
+      if (f) noteFiles = [f];
+    }
+    const wrap = container.createEl("div", { cls: "repo-link-picker-notes-inner" });
+    const head = wrap.createEl("div", { cls: "repo-link-picker-notes-header" });
+    const sa = head.createEl("button", { type: "button", cls: "ideas-btn ideas-btn-link repo-link-picker-selall", text: "Select all" });
+    const cbs = [];
+    sa.addEventListener("click", () => {
+      const allOn = cbs.length > 0 && cbs.every((c) => c.checked);
+      cbs.forEach((c) => {
+        c.checked = !allOn;
+        togglePath(c.dataset.path, c.checked);
+      });
+    });
+    for (const f of noteFiles) {
+      const lab = wrap.createEl("label", { cls: "repo-link-picker-note-row" });
+      const cb = lab.createEl("input", { type: "checkbox", cls: "repo-link-picker-note-cb" });
+      cb.dataset.path = f.path;
+      cb.addEventListener("change", () => togglePath(f.path, cb.checked));
+      const link = lab.createEl("a", {
+        href: f.path,
+        text: displayStemForBoardFile(f),
+        cls: "internal-link repo-link-picker-note-link",
+      });
+      link.setAttribute("data-href", f.path);
+      if (isBoardPdfFile(f)) lab.createEl("span", { cls: "repo-board-file-kind", text: "PDF" });
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+      cbs.push(cb);
+    }
+    if (noteFiles.length === 0) {
+      wrap.createEl("div", { cls: "repo-link-tree-empty", text: "No notes in this tile" });
     }
   }
 
-  async function render() {
-    renderBreadcrumb();
-    contentEl.empty();
-    const currentPath = buildPath();
-    const depth = navPath.length;
+  const SVG_NS = "http://www.w3.org/2000/svg";
 
-    if (depth < 3) {
-      const subs = getSubfolders(currentPath);
-      if (subs.length === 0) {
-        contentEl.createEl("div", { cls: "ideas-link-placeholder", text: "No folders here. Create layers first." });
-      } else {
-        for (const sub of subs) {
-          const btn = contentEl.createEl("button", { type: "button", text: sub.name, cls: "ideas-link-option", style: "display:block;width:100%;text-align:left" });
-          btn.addEventListener("click", () => { navPath.push(sub.name); render(); });
+  function drawRepoLinkTreeSvg(root) {
+    const svg = root.querySelector("svg.repo-link-tree-svg");
+    if (!svg || !root.isConnected) return;
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    const rr = root.getBoundingClientRect();
+    if (rr.width < 1 || rr.height < 1) return;
+
+    function addLine(x1, y1, x2, y2) {
+      const pl = document.createElementNS(SVG_NS, "path");
+      pl.setAttribute("d", "M " + x1 + " " + y1 + " L " + x2 + " " + y2);
+      pl.setAttribute("fill", "none");
+      pl.setAttribute("class", "repo-link-tree-svg-line");
+      svg.appendChild(pl);
+    }
+
+    root.querySelectorAll(".repo-link-tree-flat-layer").forEach((layer) => {
+      const inter = layer.previousElementSibling;
+      if (!inter?.classList?.contains("repo-link-tree-inter-stem-wrap")) return;
+      const prev = inter.previousElementSibling;
+      const act = prev?.querySelector(".repo-link-picker-chip.is-active");
+      const branch = layer.querySelector(".repo-link-tree-branch-wrap--layer:not(.repo-link-tree-branch-wrap--empty)");
+      if (!act || !branch) return;
+      const chips = [...branch.querySelectorAll(".repo-link-tree-col--child > .repo-link-picker-chip")];
+      if (chips.length === 0) return;
+
+      const ar = act.getBoundingClientRect();
+      const px = ar.left + ar.width / 2 - rr.left;
+      const pyBot = ar.bottom - rr.top;
+
+      const brRect = branch.getBoundingClientRect();
+      const yH = brRect.top - rr.top + 1;
+
+      const centers = chips.map((c) => {
+        const r = c.getBoundingClientRect();
+        return {
+          x: r.left + r.width / 2 - rr.left,
+          yTop: r.top - rr.top,
+        };
+      });
+
+      if (centers.length === 1) {
+        const cx = centers[0].x;
+        const yTop = centers[0].yTop;
+        if (Math.abs(px - cx) <= 8) {
+          const x = (px + cx) / 2;
+          addLine(x, pyBot, x, yTop);
+          return;
         }
       }
-      moveBtn.disabled = true;
-    } else {
-      const cfg = await getBoardConfig(currentPath);
-      let tiles = cfg.tiles || [];
-      if (!tiles.includes(UNGROUPED)) tiles = [UNGROUPED, ...tiles];
-      tileWrap.style.display = "";
-      tileSelect.length = 0;
-      for (const t of tiles) {
-        const opt = tileSelect.createEl("option");
-        opt.value = t === UNGROUPED ? "" : t;
-        opt.textContent = t === UNGROUPED ? "Default (ungrouped)" : t;
+
+      let minX = px;
+      let maxX = px;
+      centers.forEach((c) => {
+        minX = Math.min(minX, c.x);
+        maxX = Math.max(maxX, c.x);
+      });
+
+      addLine(px, pyBot, px, yH);
+      if (maxX - minX > 0.5) {
+        addLine(minX, yH, maxX, yH);
       }
-      tileSelect.addEventListener("change", () => { selectedTile = tileSelect.value || null; moveBtn.disabled = false; });
-      selectedTile = tileSelect.value || null;
-      moveBtn.disabled = false;
-      contentEl.createEl("div", { cls: "ideas-link-placeholder", text: "Board: " + navPath.slice(-1)[0] + ". Select a tile above." });
-    }
+      centers.forEach((c) => {
+        addLine(c.x, yH, c.x, c.yTop);
+      });
+    });
+
+    const w = Math.max(1, Math.ceil(root.offsetWidth));
+    const h = Math.max(1, Math.ceil(root.scrollHeight));
+    svg.setAttribute("width", String(w));
+    svg.setAttribute("height", String(h));
+    svg.style.width = w + "px";
+    svg.style.height = h + "px";
   }
 
+  function scheduleDrawRepoLinkTree(root) {
+    if (!root?.isConnected) return;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (!root?.isConnected) return;
+        positionRepoLinkTreeSublayerShifts(root);
+        drawRepoLinkTreeSvg(root);
+      });
+    });
+  }
+
+  function finishTreeLayout(root) {
+    requestAnimationFrame(() => {
+      if (!root?.isConnected) return;
+      fitRepoLinkTreeChipLabels(stack);
+      requestAnimationFrame(() => {
+        if (!root?.isConnected) return;
+        positionRepoLinkTreeSublayerShifts(root);
+        scheduleDrawRepoLinkTree(root);
+        if (onAfterRefresh) onAfterRefresh();
+      });
+    });
+  }
+
+  /** Tile row uses same fixed size as folder chips (CSS vars on .repo-link-tree-viz); redraw SVG after layout. */
+  function scheduleTileRowLayout(branchWrap) {
+    if (!branchWrap?.classList?.contains("repo-link-tree-branch-wrap--tiles")) return;
+    const treeRoot = branchWrap.closest(".repo-link-tree-root");
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (!branchWrap.isConnected) return;
+        const ps = branchWrap.closest(".repo-link-picker-stack");
+        if (ps) fitRepoLinkTreeChipLabels(ps);
+        scheduleDrawRepoLinkTree(treeRoot);
+      });
+    });
+  }
+
+  function wireLayerBranch(branchWrap, row, opts) {
+    opts = opts || {};
+    let n = 0;
+    for (let i = 0; i < row.children.length; i++) {
+      if (row.children[i].classList.contains("repo-link-tree-col")) n++;
+    }
+    if (n === 0) {
+      branchWrap.classList.add("repo-link-tree-branch-wrap--empty");
+      return;
+    }
+    branchWrap.classList.add("repo-link-tree-branch-wrap--layer");
+    if (opts.tiles) branchWrap.classList.add("repo-link-tree-branch-wrap--tiles");
+    if (n === 1) branchWrap.classList.add("repo-link-tree-branch-wrap--single");
+    else {
+      branchWrap.classList.add("repo-link-tree-branch-wrap--multi");
+      row.classList.add("repo-link-tree-row--multi");
+    }
+    row.classList.add("repo-link-tree-row--layer");
+    const treeRoot = branchWrap.closest(".repo-link-tree-root");
+    if (opts.tiles) scheduleTileRowLayout(branchWrap);
+    else scheduleDrawRepoLinkTree(treeRoot);
+    row.addEventListener("scroll", () => scheduleDrawRepoLinkTree(treeRoot), { passive: true });
+  }
+
+  function addInterStem(root) {
+    return root.createEl("div", { cls: "repo-link-tree-inter-stem-wrap" });
+  }
+
+  /** Manual tiles from YAML + subfolders that contain .md (auto group tiles); mirrors `renderBoard` tile list. */
+  function mergeBoardTileList(cfg, boardFolderPath) {
+    const UNGROUPED = "__ungrouped__";
+    let manualTiles = [...(cfg.tiles || [])];
+    const autoNames = listAutoFolderTileNames(boardFolderPath);
+    let tiles = [...manualTiles];
+    for (const name of autoNames) {
+      const dup = tiles.some((x) => x !== UNGROUPED && String(x).toLowerCase() === name.toLowerCase());
+      if (!dup) tiles.push(name);
+    }
+    if (!tiles.includes(UNGROUPED)) tiles = [UNGROUPED, ...tiles];
+    return tiles;
+  }
+
+  async function refresh() {
+    stack.empty();
+    let cfg = null;
+    if (state.tertiary) {
+      try {
+        cfg = await getBoardConfig(state.tertiary.path);
+      } catch (e) {
+        cfg = { tiles: [], tileConfig: {} };
+      }
+    }
+
+    const root = stack.createEl("div", { cls: "repo-link-tree-root repo-link-tree-root-flat" });
+    const svgEl = document.createElementNS(SVG_NS, "svg");
+    svgEl.setAttribute("class", "repo-link-tree-svg");
+    svgEl.setAttribute("aria-hidden", "true");
+    root.prepend(svgEl);
+    const bases = getSubfolders(REPO_DATA);
+    const rowBase = root.createEl("div", {
+      cls: "repo-link-tree-row repo-link-tree-row-root repo-link-tree-row-primary repo-link-tree-layer-depth repo-link-tree-layer-depth--1",
+    });
+    if (bases.length === 0) {
+      rowBase.createEl("div", { cls: "repo-link-tree-empty", text: "No folders under Data." });
+    }
+    for (const f of bases) {
+      const col = rowBase.createEl("div", { cls: "repo-link-tree-col" });
+      const b = col.createEl("button", { type: "button", cls: "repo-link-picker-chip" });
+      appendRepoChipLabel(b, f.name);
+      if (state.base && state.base.path === f.path) b.classList.add("is-active");
+      b.addEventListener("click", () => {
+        state.base = f;
+        state.secondary = null;
+        state.tertiary = null;
+        state.tileDisplayName = null;
+        selectedTargets.clear();
+        void refresh();
+      });
+    }
+
+    if (state.base) {
+      addInterStem(root);
+      const layerSec = root.createEl("div", { cls: "repo-link-tree-flat-layer repo-link-tree-layer-depth repo-link-tree-layer-depth--2" });
+      const track1 = layerSec.createEl("div", { cls: "repo-link-tree-sublayer-track" });
+      const shift1 = track1.createEl("div", { cls: "repo-link-tree-sublayer-shift" });
+      shift1.dataset.repoDepth = "2";
+      const bw1 = shift1.createEl("div", { cls: "repo-link-tree-branch-wrap repo-link-tree-branch-wrap-flat" });
+      const row1 = bw1.createEl("div", { cls: "repo-link-tree-row" });
+      const subs1 = getSubfolders(state.base.path);
+      if (subs1.length === 0) {
+        row1.createEl("div", { cls: "repo-link-tree-empty", text: "No subfolders" });
+      } else {
+        for (const sf of subs1) {
+          const ccol = row1.createEl("div", { cls: "repo-link-tree-col repo-link-tree-col--child" });
+          const bb = ccol.createEl("button", { type: "button", cls: "repo-link-picker-chip" });
+          appendRepoChipLabel(bb, sf.name);
+          if (state.secondary && state.secondary.path === sf.path) bb.classList.add("is-active");
+          bb.addEventListener("click", () => {
+            state.secondary = sf;
+            state.tertiary = null;
+            state.tileDisplayName = null;
+            selectedTargets.clear();
+            void refresh();
+          });
+        }
+        wireLayerBranch(bw1, row1);
+      }
+    }
+
+    if (state.base && state.secondary) {
+      addInterStem(root);
+      const layerTer = root.createEl("div", { cls: "repo-link-tree-flat-layer repo-link-tree-layer-depth repo-link-tree-layer-depth--3" });
+      const track2 = layerTer.createEl("div", { cls: "repo-link-tree-sublayer-track" });
+      const shift2 = track2.createEl("div", { cls: "repo-link-tree-sublayer-shift" });
+      shift2.dataset.repoDepth = "3";
+      const bw2 = shift2.createEl("div", { cls: "repo-link-tree-branch-wrap repo-link-tree-branch-wrap-flat" });
+      const row2 = bw2.createEl("div", { cls: "repo-link-tree-row" });
+      const subs2 = getSubfolders(state.secondary.path);
+      if (subs2.length === 0) {
+        row2.createEl("div", { cls: "repo-link-tree-empty", text: "No tertiary folders" });
+      } else {
+        for (const tf of subs2) {
+          const tcol = row2.createEl("div", { cls: "repo-link-tree-col repo-link-tree-col--child" });
+          const tb = tcol.createEl("button", { type: "button", cls: "repo-link-picker-chip" });
+          appendRepoChipLabel(tb, tf.name);
+          if (state.tertiary && state.tertiary.path === tf.path) tb.classList.add("is-active");
+          tb.addEventListener("click", () => {
+            state.tertiary = tf;
+            state.tileDisplayName = null;
+            selectedTargets.clear();
+            void refresh();
+          });
+        }
+        wireLayerBranch(bw2, row2);
+      }
+    }
+
+    if (state.tertiary) {
+      addInterStem(root);
+      const UNGROUPED = "__ungrouped__";
+      const tiles = mergeBoardTileList(cfg || { tiles: [], tileConfig: {} }, state.tertiary.path);
+      const layerTiles = root.createEl("div", { cls: "repo-link-tree-flat-layer repo-link-tree-layer-depth repo-link-tree-layer-depth--4" });
+      const track3 = layerTiles.createEl("div", { cls: "repo-link-tree-sublayer-track" });
+      const shift3 = track3.createEl("div", { cls: "repo-link-tree-sublayer-shift" });
+      shift3.dataset.repoDepth = "4";
+      const bw3 = shift3.createEl("div", { cls: "repo-link-tree-branch-wrap repo-link-tree-branch-wrap-flat" });
+      const row3 = bw3.createEl("div", { cls: "repo-link-tree-row" });
+      if (tiles.length === 0) {
+        row3.createEl("div", { cls: "repo-link-tree-empty", text: "No tiles on this board" });
+      } else {
+        for (const tName of tiles) {
+          const label = tName === UNGROUPED ? "Ungrouped" : tName;
+          const ncol = row3.createEl("div", { cls: "repo-link-tree-col repo-link-tree-col--child" });
+          const tbtn = ncol.createEl("button", { type: "button", cls: "repo-link-picker-chip repo-link-picker-chip--tile" });
+          appendRepoChipLabel(tbtn, label);
+          if (state.tileDisplayName === tName) tbtn.classList.add("is-active");
+          tbtn.addEventListener("click", () => {
+            state.tileDisplayName = tName;
+            selectedTargets.clear();
+            void refresh();
+          });
+        }
+        wireLayerBranch(bw3, row3, { tiles: true });
+      }
+    }
+
+    if (mode === "link" && state.tertiary && state.tileDisplayName != null) {
+      addInterStem(root);
+      const UNGROUPED = "__ungrouped__";
+      const tKey = state.tileDisplayName === UNGROUPED ? "__ungrouped__" : state.tileDisplayName;
+      const tc = ((cfg && cfg.tileConfig) || {})[tKey] || { kind: "group" };
+      const layerNotes = root.createEl("div", {
+        cls: "repo-link-tree-flat-layer repo-link-tree-flat-layer-notes repo-link-tree-layer-depth repo-link-tree-layer-depth--5",
+      });
+      const trackN = layerNotes.createEl("div", { cls: "repo-link-tree-sublayer-track" });
+      const shiftN = trackN.createEl("div", { cls: "repo-link-tree-sublayer-shift repo-link-tree-sublayer-shift--notes" });
+      shiftN.dataset.repoDepth = "5";
+      const notesHost = shiftN.createEl("div", { cls: "repo-link-picker-notes repo-link-picker-notes--tree" });
+      renderNotesRow(notesHost, state.tertiary.path, state.tileDisplayName, tc);
+    }
+
+    finishTreeLayout(root);
+  }
+
+  function getLinkTargets() {
+    if (mode !== "link") return [];
+    return [...selectedTargets];
+  }
+
+  /** @returns {{ boardFolderPath: string, tileName: string | null } | null} */
+  function getMoveDestination() {
+    if (mode !== "move") return null;
+    if (!state.tertiary || state.tileDisplayName == null) return null;
+    const UNGROUPED = "__ungrouped__";
+    const raw = state.tileDisplayName;
+    const tileName = raw === UNGROUPED ? null : raw;
+    return { boardFolderPath: state.tertiary.path, tileName };
+  }
+
+  stack.addEventListener(
+    "scroll",
+    () => {
+      const r = stack.querySelector(".repo-link-tree-root");
+      if (r) scheduleDrawRepoLinkTree(r);
+    },
+    { passive: true }
+  );
+
+  return { refresh, getLinkTargets, getMoveDestination, state };
+}
+
+async function showMoveToBoardModal(paths, onSuccess) {
+  const overlay = document.body.createEl("div", { cls: "links-search-overlay repo-link-tree-overlay" });
+  const modal = overlay.createEl("div", { cls: "links-search-modal repo-link-tree-modal repo-link-tree-modal--move" });
+  const head = modal.createEl("div", { cls: "repo-link-tree-header repo-link-tree-header--move" });
+  head.createEl("h2", { text: "Select a Location..", cls: "repo-link-tree-title" });
+  const stack = modal.createEl("div", { cls: "repo-link-picker-stack repo-link-tree-viz" });
+  const foot = modal.createEl("div", { cls: "ideas-modal-actions repo-link-tree-footer" });
+  const cancelFoot = foot.createEl("button", { type: "button", cls: "ideas-btn", text: "Cancel" });
+  const moveBtn = foot.createEl("button", { type: "button", cls: "ideas-btn ideas-btn-final", text: "Select", disabled: true });
+
+  const tree = createRepoFileTreeController(stack, "move", {
+    onAfterRefresh: () => {
+      moveBtn.disabled = tree.getMoveDestination() == null;
+    }
+  });
+
+  cancelFoot.addEventListener("click", () => overlay.remove());
   moveBtn.addEventListener("click", async () => {
-    const destPath = buildPath();
-    if (navPath.length < 3) return;
+    const dest = tree.getMoveDestination();
+    if (!dest) return;
     try {
-      await ensureFolder(destPath);
+      await ensureFolder(dest.boardFolderPath);
+      const selectedTile = dest.tileName;
       for (const p of paths) {
         const file = app.vault.getAbstractFileByPath(p);
-        if (file && file.extension === "md") {
-          await moveFile(p, destPath);
-          const movedFile = app.vault.getAbstractFileByPath(destPath + "/" + file.name);
-          if (movedFile) await setFileTileByFile(movedFile, selectedTile);
+        if (file && (file.extension === "md" || isBoardPdfFile(file))) {
+          await moveFile(p, dest.boardFolderPath);
+          const movedFile = app.vault.getAbstractFileByPath(dest.boardFolderPath + "/" + file.name);
+          if (movedFile && movedFile.extension === "md") await setFileTileByFile(movedFile, selectedTile);
         }
       }
       overlay.remove();
-      new Notice("Moved to " + navPath.join(" › "));
+      new Notice("Moved");
       if (onSuccess) onSuccess();
     } catch (e) {
       console.error("Move failed:", e);
       new Notice("Move failed: " + (e.message || String(e)));
     }
   });
-
   overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
-  await render();
+  await tree.refresh();
 }
 
 function countItems(folderPath, depth) {
   const folder = app.vault.getAbstractFileByPath(normalizeVaultPath(folderPath));
   if (!folder || !folder.children) return 0;
-  if (depth >= 2) return folder.children.filter(c => c.extension === "md" && c.name !== BOARD_CONFIG_FILE).length;
+  if (depth >= 2) {
+    return folder.children.filter((c) => {
+      const ext = String(c.extension || "").toLowerCase();
+      return (ext === "md" && c.name !== BOARD_CONFIG_FILE) || ext === "pdf";
+    }).length;
+  }
   return folder.children.filter(c => !c.extension && !c.name.startsWith(".")).length;
 }
 
@@ -1382,7 +1947,9 @@ async function appendRepoLinksToNoteFiles(sourcePaths, targetPaths) {
       try {
         linkStr = app.fileManager.generateMarkdownLink(tf, sourcePath);
       } catch (e) {
-        linkStr = "[[" + tf.basename.replace(/\.md$/i, "") + "]]";
+        linkStr = isBoardPdfFile(tf)
+          ? "[[" + tf.name + "]]"
+          : "[[" + tf.basename.replace(/\.md$/i, "") + "]]";
       }
       if (!content.includes(linkStr)) {
         lines.push("- " + linkStr);
@@ -1457,9 +2024,11 @@ function openTileContentActionsModal(opts) {
         const cb = lab.createEl("input", { type: "checkbox", cls: "repo-tile-actions-note-cb" });
         cb.dataset.path = p;
         cb.checked = single;
-        const name = (p || "").split("/").pop().replace(/\.md$/i, "");
+        const name = (p || "").split("/").pop().replace(/\.(md|pdf)$/i, "");
         const link = lab.createEl("a", { href: "#", text: name, cls: "internal-link" });
         link.setAttribute("data-href", p);
+        const pf = app.vault.getAbstractFileByPath(p);
+        if (pf && isBoardPdfFile(pf)) lab.createEl("span", { cls: "repo-board-file-kind", text: "PDF" });
         link.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); });
       }
     }
@@ -1487,379 +2056,18 @@ function openTileContentActionsModal(opts) {
 
 function openRepoLinkTreeModal(opts) {
   const { sourcePaths } = opts;
-  const overlay = document.body.createEl("div", { cls: "links-search-overlay" });
-  const modal = overlay.createEl("div", { cls: "links-search-modal repo-link-tree-modal" });
-  const head = modal.createEl("div", { cls: "repo-link-tree-header" });
-  head.createEl("h4", { text: "Select files to link:", cls: "repo-link-tree-title" });
+  const overlay = document.body.createEl("div", { cls: "links-search-overlay repo-link-tree-overlay" });
+  const modal = overlay.createEl("div", { cls: "links-search-modal repo-link-tree-modal repo-link-tree-modal--link" });
+  const head = modal.createEl("div", { cls: "repo-link-tree-header repo-link-tree-header--link" });
+  head.createEl("h2", { text: "Select a Location..", cls: "repo-link-tree-title" });
   const stack = modal.createEl("div", { cls: "repo-link-picker-stack repo-link-tree-viz" });
-  const selectedTargets = new Set();
-
-  const state = {
-    base: null,
-    secondary: null,
-    tertiary: null,
-    tileDisplayName: null
-  };
-
-  function togglePath(p, checked) {
-    if (checked) selectedTargets.add(p);
-    else selectedTargets.delete(p);
-  }
-
-  function renderNotesRow(container, boardPath, tileDisplayName, tc) {
-    const files = getMdFiles(boardPath);
-    const ftMap = new Map();
-    for (const f of files) ftMap.set(f.path, getFileTile(f.path));
-    let noteFiles = files.filter((f) => tileNameMatchesBoard(ftMap.get(f.path), tileDisplayName));
-    if (tc && tc.kind === "note" && tc.file) {
-      const one = boardPath + "/" + tc.file;
-      const f = app.vault.getAbstractFileByPath(one);
-      if (f) noteFiles = [f];
-    }
-    const wrap = container.createEl("div", { cls: "repo-link-picker-notes-inner" });
-    const head = wrap.createEl("div", { cls: "repo-link-picker-notes-header" });
-    const sa = head.createEl("button", { type: "button", cls: "ideas-btn ideas-btn-link repo-link-picker-selall", text: "Select all" });
-    const cbs = [];
-    sa.addEventListener("click", () => {
-      const allOn = cbs.length > 0 && cbs.every((c) => c.checked);
-      cbs.forEach((c) => {
-        c.checked = !allOn;
-        togglePath(c.dataset.path, c.checked);
-      });
-    });
-    for (const f of noteFiles) {
-      const lab = wrap.createEl("label", { cls: "repo-link-picker-note-row" });
-      const cb = lab.createEl("input", { type: "checkbox", cls: "repo-link-picker-note-cb" });
-      cb.dataset.path = f.path;
-      cb.addEventListener("change", () => togglePath(f.path, cb.checked));
-      const link = lab.createEl("a", {
-        href: f.path,
-        text: f.name.replace(/\.md$/i, ""),
-        cls: "internal-link repo-link-picker-note-link",
-      });
-      link.setAttribute("data-href", f.path);
-      link.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      });
-      cbs.push(cb);
-    }
-    if (noteFiles.length === 0) {
-      wrap.createEl("div", { cls: "repo-link-tree-empty", text: "No notes in this tile" });
-    }
-  }
-
-  const SVG_NS = "http://www.w3.org/2000/svg";
-
-  /** Orthogonal tree lines (reference: vertical from parent bottom-center → H-bar → vertical to each child top-center). */
-  function drawRepoLinkTreeSvg(root) {
-    const svg = root.querySelector("svg.repo-link-tree-svg");
-    if (!svg || !root.isConnected) return;
-    while (svg.firstChild) svg.removeChild(svg.firstChild);
-    const rr = root.getBoundingClientRect();
-    if (rr.width < 1 || rr.height < 1) return;
-
-    function addLine(x1, y1, x2, y2) {
-      const pl = document.createElementNS(SVG_NS, "path");
-      pl.setAttribute("d", "M " + x1 + " " + y1 + " L " + x2 + " " + y2);
-      pl.setAttribute("fill", "none");
-      pl.setAttribute("class", "repo-link-tree-svg-line");
-      svg.appendChild(pl);
-    }
-
-    root.querySelectorAll(".repo-link-tree-flat-layer").forEach((layer) => {
-      const inter = layer.previousElementSibling;
-      if (!inter?.classList?.contains("repo-link-tree-inter-stem-wrap")) return;
-      const prev = inter.previousElementSibling;
-      const act = prev?.querySelector(".repo-link-picker-chip.is-active");
-      const branch = layer.querySelector(".repo-link-tree-branch-wrap--layer:not(.repo-link-tree-branch-wrap--empty)");
-      if (!act || !branch) return;
-      const chips = [...branch.querySelectorAll(".repo-link-tree-col--child > .repo-link-picker-chip")];
-      if (chips.length === 0) return;
-
-      const ar = act.getBoundingClientRect();
-      const px = ar.left + ar.width / 2 - rr.left;
-      const pyBot = ar.bottom - rr.top;
-
-      const brRect = branch.getBoundingClientRect();
-      const yH = brRect.top - rr.top + 1;
-
-      const centers = chips.map((c) => {
-        const r = c.getBoundingClientRect();
-        return {
-          x: r.left + r.width / 2 - rr.left,
-          yTop: r.top - rr.top,
-        };
-      });
-
-      /* One child under parent: straight vertical (parent bottom-center → child top-center).
-         Avoids a tiny H + two stems when px/cx differ by a few subpixels (Z-shaped jog). */
-      if (centers.length === 1) {
-        const cx = centers[0].x;
-        const yTop = centers[0].yTop;
-        if (Math.abs(px - cx) <= 8) {
-          const x = (px + cx) / 2;
-          addLine(x, pyBot, x, yTop);
-          return;
-        }
-      }
-
-      let minX = px;
-      let maxX = px;
-      centers.forEach((c) => {
-        minX = Math.min(minX, c.x);
-        maxX = Math.max(maxX, c.x);
-      });
-
-      addLine(px, pyBot, px, yH);
-      if (maxX - minX > 0.5) {
-        addLine(minX, yH, maxX, yH);
-      }
-      centers.forEach((c) => {
-        addLine(c.x, yH, c.x, c.yTop);
-      });
-    });
-
-    const w = Math.max(1, Math.ceil(root.offsetWidth));
-    const h = Math.max(1, Math.ceil(root.scrollHeight));
-    svg.setAttribute("width", String(w));
-    svg.setAttribute("height", String(h));
-    svg.style.width = w + "px";
-    svg.style.height = h + "px";
-  }
-
-  function scheduleDrawRepoLinkTree(root) {
-    if (!root?.isConnected) return;
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => drawRepoLinkTreeSvg(root));
-    });
-  }
-
-  /** All tile chips in a row share one square size = max of each tile’s natural square side. */
-  function equalizeTileSquares(branchWrap) {
-    if (!branchWrap?.classList?.contains("repo-link-tree-branch-wrap--tiles")) return;
-    const tiles = [...branchWrap.querySelectorAll(".repo-link-picker-chip--tile")];
-    if (tiles.length === 0) return;
-    const treeRoot = branchWrap.closest(".repo-link-tree-root");
-    function run() {
-      if (!branchWrap.isConnected) return;
-      branchWrap.style.removeProperty("--repo-tile-size");
-      branchWrap.classList.remove("repo-link-tree-tiles--equalized");
-      tiles.forEach((el) => {
-        el.style.removeProperty("width");
-        el.style.removeProperty("height");
-      });
-      void branchWrap.offsetWidth;
-      let maxSide = 0;
-      tiles.forEach((el) => {
-        const s = Math.max(el.offsetWidth, el.offsetHeight);
-        maxSide = Math.max(maxSide, s);
-      });
-      if (maxSide < 1) return;
-      const cap = Math.min(
-        18 * (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16),
-        branchWrap.getBoundingClientRect().width * 0.98
-      );
-      const side = Math.min(Math.ceil(maxSide), Math.max(44, Math.floor(cap)));
-      branchWrap.classList.add("repo-link-tree-tiles--equalized");
-      branchWrap.style.setProperty("--repo-tile-size", side + "px");
-      scheduleDrawRepoLinkTree(treeRoot);
-    }
-    requestAnimationFrame(() => {
-      requestAnimationFrame(run);
-    });
-  }
-
-  /** Markup + classes for a sub-layer row (lines drawn by SVG). */
-  function wireLayerBranch(branchWrap, row, opts) {
-    opts = opts || {};
-    const cols = row.querySelectorAll(":scope > .repo-link-tree-col");
-    const n = cols.length;
-    if (n === 0) {
-      branchWrap.classList.add("repo-link-tree-branch-wrap--empty");
-      return;
-    }
-    branchWrap.classList.add("repo-link-tree-branch-wrap--layer");
-    if (opts.tiles) branchWrap.classList.add("repo-link-tree-branch-wrap--tiles");
-    if (n === 1) branchWrap.classList.add("repo-link-tree-branch-wrap--single");
-    else {
-      branchWrap.classList.add("repo-link-tree-branch-wrap--multi");
-      row.classList.add("repo-link-tree-row--multi");
-    }
-    row.classList.add("repo-link-tree-row--layer");
-    const treeRoot = branchWrap.closest(".repo-link-tree-root");
-    if (opts.tiles) equalizeTileSquares(branchWrap);
-    scheduleDrawRepoLinkTree(treeRoot);
-    try {
-      if (typeof ResizeObserver !== "undefined") {
-        const ro = new ResizeObserver(() => {
-          if (opts.tiles) equalizeTileSquares(branchWrap);
-          else scheduleDrawRepoLinkTree(treeRoot);
-        });
-        ro.observe(branchWrap);
-        ro.observe(row);
-      }
-    } catch (e) {}
-    row.addEventListener("scroll", () => scheduleDrawRepoLinkTree(treeRoot), { passive: true });
-  }
-
-  function addInterStem(root) {
-    return root.createEl("div", { cls: "repo-link-tree-inter-stem-wrap" });
-  }
-
-  async function refresh() {
-    stack.empty();
-    let cfg = null;
-    if (state.tertiary) {
-      try {
-        cfg = await getBoardConfig(state.tertiary.path);
-      } catch (e) {
-        cfg = { tiles: [], tileConfig: {} };
-      }
-    }
-
-    const root = stack.createEl("div", { cls: "repo-link-tree-root repo-link-tree-root-flat" });
-    const svgEl = document.createElementNS(SVG_NS, "svg");
-    svgEl.setAttribute("class", "repo-link-tree-svg");
-    svgEl.setAttribute("aria-hidden", "true");
-    root.prepend(svgEl);
-    const bases = getSubfolders(REPO_DATA);
-    const rowBase = root.createEl("div", { cls: "repo-link-tree-row repo-link-tree-row-root repo-link-tree-row-primary" });
-    if (bases.length === 0) {
-      rowBase.createEl("div", { cls: "repo-link-tree-empty", text: "No folders under Data." });
-    }
-    for (const f of bases) {
-      const col = rowBase.createEl("div", { cls: "repo-link-tree-col" });
-      const b = col.createEl("button", { type: "button", cls: "repo-link-picker-chip", text: f.name });
-      if (state.base && state.base.path === f.path) b.classList.add("is-active");
-      b.addEventListener("click", () => {
-        state.base = f;
-        state.secondary = null;
-        state.tertiary = null;
-        state.tileDisplayName = null;
-        selectedTargets.clear();
-        void refresh();
-      });
-    }
-
-    if (state.base) {
-      addInterStem(root);
-      const layerSec = root.createEl("div", { cls: "repo-link-tree-flat-layer" });
-      const bw1 = layerSec.createEl("div", { cls: "repo-link-tree-branch-wrap repo-link-tree-branch-wrap-flat" });
-      const row1 = bw1.createEl("div", { cls: "repo-link-tree-row" });
-      const subs1 = getSubfolders(state.base.path);
-      if (subs1.length === 0) {
-        row1.createEl("div", { cls: "repo-link-tree-empty", text: "No subfolders" });
-      } else {
-        for (const sf of subs1) {
-          const ccol = row1.createEl("div", { cls: "repo-link-tree-col repo-link-tree-col--child" });
-          const bb = ccol.createEl("button", { type: "button", cls: "repo-link-picker-chip", text: sf.name });
-          if (state.secondary && state.secondary.path === sf.path) bb.classList.add("is-active");
-          bb.addEventListener("click", () => {
-            state.secondary = sf;
-            state.tertiary = null;
-            state.tileDisplayName = null;
-            selectedTargets.clear();
-            void refresh();
-          });
-        }
-        wireLayerBranch(bw1, row1);
-      }
-    }
-
-    if (state.base && state.secondary) {
-      addInterStem(root);
-      const layerTer = root.createEl("div", { cls: "repo-link-tree-flat-layer" });
-      const bw2 = layerTer.createEl("div", { cls: "repo-link-tree-branch-wrap repo-link-tree-branch-wrap-flat" });
-      const row2 = bw2.createEl("div", { cls: "repo-link-tree-row" });
-      const subs2 = getSubfolders(state.secondary.path);
-      if (subs2.length === 0) {
-        row2.createEl("div", { cls: "repo-link-tree-empty", text: "No tertiary folders" });
-      } else {
-        for (const tf of subs2) {
-          const hasBoard = !!app.vault.getAbstractFileByPath(tf.path + "/" + BOARD_CONFIG_FILE);
-          const tcol = row2.createEl("div", { cls: "repo-link-tree-col repo-link-tree-col--child" });
-          const tb = tcol.createEl("button", { type: "button", cls: "repo-link-picker-chip", text: tf.name });
-          if (!hasBoard) {
-            tb.classList.add("is-disabled");
-            tb.title = "No _board.md — not a board folder";
-          } else if (state.tertiary && state.tertiary.path === tf.path) {
-            tb.classList.add("is-active");
-          }
-          tb.addEventListener("click", () => {
-            if (!hasBoard) return;
-            state.tertiary = tf;
-            state.tileDisplayName = null;
-            selectedTargets.clear();
-            void refresh();
-          });
-        }
-        wireLayerBranch(bw2, row2);
-      }
-    }
-
-    if (state.tertiary && cfg) {
-      addInterStem(root);
-      const UNGROUPED = "__ungrouped__";
-      const tiles = cfg.tiles || [];
-      const tileConfig = cfg.tileConfig || {};
-      const layerTiles = root.createEl("div", { cls: "repo-link-tree-flat-layer" });
-      const bw3 = layerTiles.createEl("div", { cls: "repo-link-tree-branch-wrap repo-link-tree-branch-wrap-flat" });
-      const row3 = bw3.createEl("div", { cls: "repo-link-tree-row" });
-      if (tiles.length === 0) {
-        row3.createEl("div", { cls: "repo-link-tree-empty", text: "No tiles on this board" });
-      } else {
-        for (const tName of tiles) {
-          const label = tName === UNGROUPED ? "Ungrouped" : tName;
-          const ncol = row3.createEl("div", { cls: "repo-link-tree-col repo-link-tree-col--child" });
-          const tbtn = ncol.createEl("button", { type: "button", cls: "repo-link-picker-chip repo-link-picker-chip--tile", text: label });
-          if (state.tileDisplayName === tName) tbtn.classList.add("is-active");
-          tbtn.addEventListener("click", () => {
-            state.tileDisplayName = tName;
-            selectedTargets.clear();
-            void refresh();
-          });
-        }
-        wireLayerBranch(bw3, row3, { tiles: true });
-      }
-    }
-
-    if (state.tertiary && state.tileDisplayName != null && cfg) {
-      addInterStem(root);
-      const UNGROUPED = "__ungrouped__";
-      const tKey = state.tileDisplayName === UNGROUPED ? "__ungrouped__" : state.tileDisplayName;
-      const tc = (cfg.tileConfig || {})[tKey] || { kind: "group" };
-      const layerNotes = root.createEl("div", { cls: "repo-link-tree-flat-layer repo-link-tree-flat-layer-notes" });
-      const notesHost = layerNotes.createEl("div", { cls: "repo-link-picker-notes repo-link-picker-notes--tree" });
-      renderNotesRow(notesHost, state.tertiary.path, state.tileDisplayName, tc);
-    }
-
-    scheduleDrawRepoLinkTree(root);
-    try {
-      if (typeof ResizeObserver !== "undefined") {
-        const ro = new ResizeObserver(() => scheduleDrawRepoLinkTree(root));
-        ro.observe(root);
-      }
-    } catch (e) {}
-  }
-
-  stack.addEventListener(
-    "scroll",
-    () => {
-      const r = stack.querySelector(".repo-link-tree-root");
-      if (r) scheduleDrawRepoLinkTree(r);
-    },
-    { passive: true }
-  );
-
-  void refresh();
-
+  const tree = createRepoFileTreeController(stack, "link");
   const foot = modal.createEl("div", { cls: "ideas-modal-actions repo-link-tree-footer" });
   const cancelFoot = foot.createEl("button", { type: "button", cls: "ideas-btn", text: "Cancel" });
   cancelFoot.addEventListener("click", () => overlay.remove());
   const linkGo = foot.createEl("button", { type: "button", cls: "ideas-btn ideas-btn-final", text: "Link" });
   linkGo.addEventListener("click", async () => {
-    const targets = [...selectedTargets];
+    const targets = tree.getLinkTargets();
     if (targets.length === 0) {
       new Notice("Select at least one target note");
       return;
@@ -1869,30 +2077,39 @@ function openRepoLinkTreeModal(opts) {
     new Notice("Links added to " + sourcePaths.length + " note(s)");
   });
   overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
+  void tree.refresh();
 }
 
 async function renderBoard(parentEl, folderPath) {
   const boardConfig = await getBoardConfig(folderPath);
-  let tiles = boardConfig.tiles || [];
+  let manualTiles = [...(boardConfig.tiles || [])];
+  const autoFolderTileNames = listAutoFolderTileNames(folderPath);
   let sizes = boardConfig.sizes || {};
   let tileConfig = boardConfig.tileConfig || {};
   let tileProps = { ...(boardConfig.tileProps || {}) };
-  const files = getMdFiles(folderPath);
-  if (files.length === 0 && tiles.length === 0) {
+  const { rootFiles, allFiles: files } = collectBoardMarkdownFiles(folderPath);
+  const UNGROUPED = "__ungrouped__";
+  if (files.length === 0 && manualTiles.length === 0 && autoFolderTileNames.length === 0) {
     pendingBoardSelectTileKey = null;
     parentEl.createEl("div", { cls: "repo-layer-empty", text: "No notes yet. Click + to add one." });
     return;
   }
 
   const fileTiles = new Map();
-  const UNGROUPED = "__ungrouped__";
   for (const f of files) {
+    fileTiles.set(f.path, effectiveBoardTileForFile(f.path, folderPath));
+  }
+  for (const f of rootFiles) {
     const t = getFileTile(f.path);
-    fileTiles.set(f.path, t);
     if (t && t !== UNGROUPED) {
-      const dup = tiles.some(x => x !== UNGROUPED && String(x).toLowerCase() === String(t).toLowerCase());
-      if (!dup) tiles = [...tiles, t];
+      const dup = manualTiles.some((x) => x !== UNGROUPED && String(x).toLowerCase() === String(t).toLowerCase());
+      if (!dup) manualTiles.push(t);
     }
+  }
+  let tiles = [...manualTiles];
+  for (const name of autoFolderTileNames) {
+    const dup = tiles.some((x) => x !== UNGROUPED && String(x).toLowerCase() === name.toLowerCase());
+    if (!dup) tiles = [...tiles, name];
   }
   if (!tiles.includes(UNGROUPED)) tiles = [UNGROUPED, ...tiles];
 
@@ -2022,7 +2239,7 @@ async function renderBoard(parentEl, folderPath) {
     for (const [k, p] of Object.entries(layout)) {
       newSizes[k] = { w: Math.round(p.w), h: Math.round(p.h), x: Math.round(p.x), y: Math.round(p.y) };
     }
-    await saveBoardConfig(folderPath, { tiles, sizes: newSizes, tileConfig: full.tileConfig || {}, tileProps: full.tileProps || {} });
+    await saveBoardConfig(folderPath, { tiles: manualTiles, sizes: newSizes, tileConfig: full.tileConfig || {}, tileProps: full.tileProps || {} });
   }
 
   function computeLayout() {
@@ -2056,8 +2273,8 @@ async function renderBoard(parentEl, folderPath) {
     const pos = layout[tileKey] || { x: EDGE, y: EDGE, w: defW, h: defH };
     const tc = tileConfig[tileKey] || { kind: "group" };
     const isNoteTile = tc.kind === "note" && tc.file;
-    const allMemberFiles = files.filter(f =>
-      tileNameMatchesBoard(fileTiles.get(f.path), tileName)
+    const allMemberFiles = files.filter((f) =>
+      tileNameMatchesBoard(fileTiles.get(f.path), tileName, f.path, folderPath)
     );
     const tp = tileProps[tileKey] || {};
     let tileFiles = allMemberFiles.slice();
@@ -2163,14 +2380,70 @@ async function renderBoard(parentEl, folderPath) {
         const data = e.dataTransfer.getData("text/plain");
         if (data.startsWith("tile:")) return;
         const path = data;
-        const file = fileByPath.get(path) || app.vault.getAbstractFileByPath(path);
-        if (!file || file.extension !== "md") return;
+        let file = fileByPath.get(path) || app.vault.getAbstractFileByPath(path);
+        if (!file || (file.extension !== "md" && !isBoardPdfFile(file))) return;
         const targetTile = tileBox.dataset.tile || null;
+        const targetName = targetTile || "";
+        const rel = relPathFromBoardRoot(folderPath, file.path);
+        const isUngroupedTarget = !targetName;
+        const autoMatch = autoFolderTileNames.find((n) => n.toLowerCase() === String(targetName).toLowerCase());
+
+        if (isBoardPdfFile(file) && targetName && !autoMatch && !isUngroupedTarget) {
+          new Notice("PDF: use a subfolder for this tile, or drop on Ungrouped.");
+          return;
+        }
+
         saveSessionState();
-        await setFileTileByFile(file, targetTile ? targetTile : null);
-        new Notice("Moved");
-        boardEditMode = true;
-        renderVaultView();
+        try {
+          const normRoot = normalizeVaultPath(folderPath);
+          if (autoMatch) {
+            const destDir = normRoot + "/" + autoMatch;
+            await ensureFolder(destDir);
+            let destPath = destDir + "/" + file.name;
+            if (destPath !== file.path && app.vault.getAbstractFileByPath(destPath)) {
+              const stem = (file.name || "").replace(/\.(md|pdf)$/i, "");
+              const ext = file.extension || "md";
+              let n = 2;
+              while (app.vault.getAbstractFileByPath(destPath)) {
+                destPath = destDir + "/" + stem + " " + n + "." + ext;
+                n++;
+              }
+            }
+            if (file.path !== destPath) {
+              await app.fileManager.renameFile(file, destPath);
+              file = app.vault.getAbstractFileByPath(destPath);
+            }
+            if (file) await setFileTileByFile(file, null);
+          } else if (isUngroupedTarget) {
+            const rootPath = normRoot + "/" + file.name;
+            if (rel && rel.includes("/")) {
+              if (app.vault.getAbstractFileByPath(rootPath) && rootPath !== file.path) {
+                new Notice("A note with that name already exists at board root.");
+                return;
+              }
+              await app.fileManager.renameFile(file, rootPath);
+              file = app.vault.getAbstractFileByPath(rootPath);
+            }
+            if (file) await setFileTileByFile(file, null);
+          } else {
+            if (rel && rel.includes("/")) {
+              const rootPath = normRoot + "/" + file.name;
+              if (app.vault.getAbstractFileByPath(rootPath) && rootPath !== file.path) {
+                new Notice("A note with that name already exists at board root.");
+                return;
+              }
+              await app.fileManager.renameFile(file, rootPath);
+              file = app.vault.getAbstractFileByPath(rootPath);
+            }
+            if (file) await setFileTileByFile(file, targetName);
+          }
+          new Notice("Moved");
+          boardEditMode = true;
+          renderVaultView();
+        } catch (err) {
+          console.error(err);
+          new Notice("Move failed: " + (err.message || String(err)));
+        }
       });
     }
 
@@ -2206,7 +2479,8 @@ async function renderBoard(parentEl, folderPath) {
         isNoteTile,
         allMemberFiles,
         tilePropsRef: tileProps,
-        tilesList: tiles,
+        tilesList: manualTiles,
+        autoFolderTileNames,
         tileConfigSnapshot: { ...tileConfig },
         getSizes: () => {
           const o = {};
@@ -2237,8 +2511,16 @@ async function renderBoard(parentEl, folderPath) {
         const item = list.createEl("div", { cls: "repo-board-tile-item" });
         item.dataset.path = f.path;
         item.draggable = editMode;
-        const link = item.createEl("a", { href: f.path, text: (f.name || "").replace(/\.md$/, ""), cls: "internal-link" });
+        const link = item.createEl("a", { href: f.path, text: displayStemForBoardFile(f), cls: "internal-link" });
         link.setAttribute("data-href", f.path);
+        if (isBoardPdfFile(f)) {
+          item.createEl("span", { cls: "repo-board-file-kind", text: "PDF" });
+          link.addEventListener("click", async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            await openVaultFileInActiveLeaf(f.path);
+          });
+        }
         item.addEventListener("dragstart", (e) => {
           if (!editMode) return;
           e.stopPropagation();
@@ -2366,11 +2648,17 @@ async function renderVaultView() {
 async function showExistingNotesPickerModal(folderPath, initialSelected, onDone) {
   const UNGROUPED = "__ungrouped__";
   const cfg = await getBoardConfig(folderPath);
-  let tileList = cfg.tiles || [];
+  let tileList = [...(cfg.tiles || [])];
+  const autoNames = listAutoFolderTileNames(folderPath);
+  for (const name of autoNames) {
+    if (!tileList.some((x) => x !== UNGROUPED && String(x).toLowerCase() === name.toLowerCase())) {
+      tileList.push(name);
+    }
+  }
   if (!tileList.includes(UNGROUPED)) tileList = [UNGROUPED, ...tileList];
-  const files = getMdFiles(folderPath);
+  const { allFiles: files } = collectBoardMarkdownFiles(folderPath);
   const fileTiles = new Map();
-  for (const f of files) fileTiles.set(f.path, getFileTile(f.path));
+  for (const f of files) fileTiles.set(f.path, effectiveBoardTileForFile(f.path, folderPath));
   const selected = new Set(initialSelected);
 
   const overlay = document.body.createEl("div", { cls: "links-search-overlay" });
@@ -2380,11 +2668,13 @@ async function showExistingNotesPickerModal(folderPath, initialSelected, onDone)
   for (const tileName of tileList) {
     const col = scroll.createEl("div", { cls: "repo-picker-col" });
     col.createEl("div", { cls: "repo-picker-col-title", text: tileName === UNGROUPED ? "Ungrouped" : tileName });
-    const inTile = files.filter(f => tileNameMatchesBoard(fileTiles.get(f.path), tileName));
+    const inTile = files.filter((f) => tileNameMatchesBoard(fileTiles.get(f.path), tileName, f.path, folderPath));
     for (const f of inTile) {
       const row = col.createEl("button", { type: "button", cls: "repo-picker-note-row" });
       const mark = row.createEl("span", { cls: "repo-picker-check", text: selected.has(f.path) ? "✓" : "" });
-      row.createEl("span", { cls: "repo-picker-note-name", text: (f.name || "").replace(/\.md$/, "") });
+      const nameEl = row.createEl("span", { cls: "repo-picker-note-name" });
+      nameEl.appendChild(document.createTextNode(displayStemForBoardFile(f)));
+      if (isBoardPdfFile(f)) nameEl.createEl("span", { cls: "repo-board-file-kind", text: "PDF" });
       row.addEventListener("click", () => {
         if (selected.has(f.path)) {
           selected.delete(f.path);
@@ -2489,18 +2779,24 @@ function showCreatePopup() {
 
   (async () => {
     const cfg = await getBoardConfig(currentFolder);
-    let tileList = cfg.tiles || [];
+    let tileList = [...(cfg.tiles || [])];
+    const autoN = listAutoFolderTileNames(currentFolder);
+    for (const n of autoN) {
+      if (!tileList.some((x) => x !== UNGROUPED && String(x).toLowerCase() === n.toLowerCase())) {
+        tileList.push(n);
+      }
+    }
     if (!tileList.includes(UNGROUPED)) tileList = [UNGROUPED, ...tileList];
     for (const g of tileList) {
       const opt = noteTileSelect.createEl("option");
       opt.value = g === UNGROUPED ? "" : g;
       opt.textContent = g === UNGROUPED ? "Ungrouped" : g;
     }
-    const files = getMdFiles(currentFolder);
+    const { allFiles } = collectBoardMarkdownFiles(currentFolder);
     const defOpt = singleFileSelect.createEl("option");
     defOpt.value = "";
     defOpt.textContent = "— Choose a note —";
-    for (const f of files) {
+    for (const f of allFiles.filter((x) => x.extension === "md")) {
       const opt = singleFileSelect.createEl("option");
       opt.value = f.name;
       opt.textContent = (f.name || "").replace(/\.md$/, "");
@@ -2537,6 +2833,10 @@ function showCreatePopup() {
     const sizes = cfg.sizes || {};
     const tileConfig = { ...(cfg.tileConfig || {}) };
     if (tileList.includes(name)) { new Notice("Tile already exists"); return; }
+    if (listAutoFolderTileNames(currentFolder).some((n) => n.toLowerCase() === name.toLowerCase())) {
+      new Notice("That name is already used by a folder on this board.");
+      return;
+    }
 
     if (tileSubtype === "single") {
       const fname = singleFileSelect.value;
@@ -2586,11 +2886,16 @@ const breadcrumbContainer = topBar.createEl("div", { cls: "repo-bar-breadcrumb r
 const barRepoActions = topBar.createEl("div", { cls: "repo-bar-repo-actions" });
 const repoEditBtn = barRepoActions.createEl("button", { type: "button", text: "Edit", cls: "ideas-btn ideas-btn-link repo-top-edit" });
 const repoAddBtn = barRepoActions.createEl("button", { type: "button", text: "+", cls: "ideas-btn ideas-btn-final ideas-add-btn repo-top-add" });
-repoAddBtn.style.display = "none";
 repoEditBtn.style.display = "";
 repoEditBtn.disabled = true;
 repoEditBtn.classList.add("repo-top-edit-static");
-repoAddBtn.addEventListener("click", showCreatePopup);
+repoAddBtn.addEventListener("click", () => {
+  if (getCurrentViewId() === "new-dev") {
+    showNewNoteModalForFolder(REPO_INCOMING);
+  } else {
+    showCreatePopup();
+  }
+});
 
 viewNewDev = container.createEl("div", { cls: "repo-view repo-view-new-dev" });
 viewRepository = container.createEl("div", { cls: "repo-view repo-view-repository" });
@@ -2639,7 +2944,7 @@ async function showView(which, skipHistoryPush) {
   if (which === "new-dev") {
     viewNewDev.style.display = "";
     viewRepository.style.display = "none";
-    repoAddBtn.style.display = "none";
+    repoAddBtn.style.display = "";
     btnNewDev.classList.add("active");
     btnRepo.classList.remove("active");
     breadcrumbContainer.empty();
@@ -2707,6 +3012,6 @@ try {
 } catch (e) {}
 const freshPages = repoNewPages.filter(p => !pageHasDevelopingTag(p));
 const developingPages = repoNewPages.filter(p => pageHasDevelopingTag(p));
-createSection("New", REPO_INCOMING, freshPages, viewNewDev, "mark-developing");
-createSection("Developing", REPO_INCOMING, developingPages, viewNewDev, "mark-new");
+createSection("New", REPO_INCOMING, freshPages, viewNewDev, "mark-developing", { showAddButton: false });
+createSection("Developing", REPO_INCOMING, developingPages, viewNewDev, "mark-new", { showAddButton: false });
 ```

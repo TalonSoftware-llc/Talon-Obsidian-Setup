@@ -499,10 +499,10 @@
 .repo-top-bar-unified {
   display: flex;
   align-items: center;
-  gap: 0.5em;
-  margin-bottom: 0.6em;
-  padding: 0.5em 0.5em;
-  min-height: 2.5em;
+  gap: 0.35em;
+  margin-bottom: 0.45em;
+  padding: 0.28em 0.4em;
+  min-height: 0;
   line-height: 1;
   background: var(--background-secondary);
   border-radius: 6px;
@@ -512,9 +512,8 @@
   top: 0;
   z-index: 50;
   box-sizing: border-box;
-  /* Left toggle & Home height; middle row (Edit / + / ‹ ›) slightly shorter but same tier */
-  --repo-toggle-outer-height: 2.15em;
-  --repo-actions-height: calc(var(--repo-toggle-outer-height) * 0.9);
+  /* One height for slider, Home, ‹ ›, Edit, + */
+  --repo-bar-btn-height: 1.75em;
 }
 
 .repo-top-bar-unified .repo-bar-controls-left,
@@ -530,7 +529,7 @@
 .repo-bar-repo-actions {
   display: flex;
   align-items: center;
-  gap: 0.35em;
+  gap: 0.28em;
   flex-shrink: 0;
   margin-left: auto;
 }
@@ -556,7 +555,7 @@
 .repo-bar-controls-left {
   display: flex;
   align-items: center;
-  gap: 0.55em;
+  gap: 0.4em;
   flex-shrink: 0;
   flex-grow: 0;
   white-space: nowrap;
@@ -604,14 +603,14 @@
   min-width: 0;
   width: 0;
   max-width: 100%;
-  min-height: 2.35em;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   overflow-x: auto;
   overflow-y: visible;
-  margin-left: 0.55em;
-  padding: 0.45em 0.65em 0.45em 0.85em;
+  margin-left: 0.4em;
+  padding: 0.2em 0.45em 0.2em 0.55em;
   border-left: 1px solid var(--background-modifier-border);
   box-sizing: border-box;
 }
@@ -654,13 +653,13 @@
 
 .repo-top-add {
   flex-shrink: 0;
-  padding: 0.2em 0.45em;
-  font-size: 0.9em;
+  padding: 0;
+  font-size: 0.82em;
 }
 
 .repo-top-edit {
-  padding: 0.2em 0.5em;
-  font-size: 0.85em;
+  padding: 0;
+  font-size: 0.8em;
 }
 
 .repo-top-edit.repo-top-edit-static {
@@ -672,15 +671,14 @@
   box-sizing: border-box;
 }
 
-/* Smaller than toggle & Home; Edit / + / ‹ › share one height tier */
+/* Edit / + / ‹ › / Home / New|Repository — same height */
 .repo-top-bar-unified .repo-bar-repo-actions .repo-top-edit,
 .repo-top-bar-unified .repo-bar-repo-actions .repo-top-add {
   box-sizing: border-box;
-  height: var(--repo-actions-height);
-  min-height: var(--repo-actions-height);
-  max-height: var(--repo-actions-height);
-  padding: 0 0.4em;
-  font-size: 0.74em;
+  height: var(--repo-bar-btn-height);
+  min-height: var(--repo-bar-btn-height);
+  max-height: var(--repo-bar-btn-height);
+  padding: 0 0.45em;
   line-height: 1;
   display: inline-flex;
   align-items: center;
@@ -688,28 +686,28 @@
 }
 
 .repo-top-bar-unified .repo-bar-nav-arrows .repo-nav-btn {
-  width: var(--repo-actions-height);
-  height: var(--repo-actions-height);
-  min-width: var(--repo-actions-height);
+  width: var(--repo-bar-btn-height);
+  height: var(--repo-bar-btn-height);
+  min-width: var(--repo-bar-btn-height);
   box-sizing: border-box;
-  font-size: 0.92em;
+  font-size: 0.88em;
 }
 
 .repo-top-bar-unified .repo-bar-home-wrap .repo-nav-btn.repo-nav-home {
-  width: var(--repo-toggle-outer-height);
-  height: var(--repo-toggle-outer-height);
-  min-width: var(--repo-toggle-outer-height);
+  width: var(--repo-bar-btn-height);
+  height: var(--repo-bar-btn-height);
+  min-width: var(--repo-bar-btn-height);
   box-sizing: border-box;
   flex-shrink: 0;
   border-radius: 4px;
-  font-size: 1.05em;
+  font-size: 1em;
 }
 
 .repo-slider-inner {
   display: flex;
   align-items: center;
-  gap: 0.15em;
-  padding: 0.15em;
+  gap: 0.1em;
+  padding: 0.1em 0.15em;
   margin-left: 0;
   background: var(--background-primary);
   border-radius: 4px;
@@ -717,20 +715,26 @@
 }
 
 .repo-top-bar-unified .repo-slider-inner {
-  min-height: var(--repo-toggle-outer-height);
+  min-height: var(--repo-bar-btn-height);
   box-sizing: border-box;
 }
 
 .repo-slider-btn {
-  padding: 0.25em 0.6em;
+  box-sizing: border-box;
+  height: var(--repo-bar-btn-height);
+  min-height: var(--repo-bar-btn-height);
+  padding: 0 0.5em;
   border: none;
-  border-radius: 4px;
+  border-radius: 3px;
   background: transparent;
   cursor: pointer;
   font-weight: 500;
-  font-size: 0.8em;
+  font-size: 0.78em;
   color: var(--text-muted);
   transition: background 0.15s, color 0.15s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .repo-slider-btn:hover {
@@ -1399,6 +1403,28 @@
   cursor: default;
 }
 
+/* PDF (and other non-md) rows on boards: small type label next to the link */
+.repo-board-file-kind {
+  flex-shrink: 0;
+  font-size: 0.65em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  padding: 0.08em 0.35em;
+  line-height: 1.2;
+  margin-left: 0.35em;
+}
+
+.repo-tile-props-link-name .repo-board-file-kind,
+.repo-picker-note-name .repo-board-file-kind,
+.repo-link-picker-note-row .repo-board-file-kind {
+  margin-left: 0.35em;
+  vertical-align: middle;
+}
+
 /* ── Repository: create modal (+ on board) ── */
 
 .repo-create-modal {
@@ -1970,6 +1996,25 @@ body .links-search-overlay {
   -webkit-overflow-scrolling: touch;
 }
 
+/* File tree modals (link + move): nearly full screen; margin = click backdrop to dismiss */
+body .repo-link-tree-overlay.links-search-overlay {
+  align-items: stretch !important;
+  justify-content: stretch !important;
+  padding: max(20px, env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) max(20px, env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px)) !important;
+}
+
+body .repo-link-tree-overlay .repo-link-tree-modal.links-search-modal {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  flex: 1 1 auto;
+  flex-shrink: 1 !important;
+  padding: 0.85rem 1rem 1rem;
+}
+
 .links-search-modal {
   position: relative;
   z-index: 1;
@@ -1989,15 +2034,16 @@ body .links-search-overlay {
   padding: 0.55rem 0.65rem 0.65rem;
 }
 
-/* Link picker: fixed panel — width +25% vs previous 520px square; height unchanged */
+/* Link picker: use the viewport; inner stack scrolls when content overflows */
 .repo-link-tree-modal.links-search-modal {
-  --repo-link-modal-h: min(520px, calc(100vh - 2rem), calc(100dvh - 2rem));
-  --repo-link-modal-w: min(650px, calc(100vw - 2rem));
+  --repo-link-modal-h: min(calc(100dvh - 1.25rem), calc(100vh - 1.25rem));
+  --repo-link-modal-w: min(calc(100vw - 1.25rem), calc(100dvw - 1.25rem));
   width: var(--repo-link-modal-w);
   height: var(--repo-link-modal-h);
   max-width: var(--repo-link-modal-w);
   max-height: var(--repo-link-modal-h);
   min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -2009,14 +2055,26 @@ body .links-search-overlay {
 
 .repo-link-tree-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  margin-bottom: 0.5em;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 0.65em;
+  padding: 0.2em 0.75rem 0.35em;
+  box-sizing: border-box;
 }
 
 .repo-link-tree-title {
   margin: 0;
-  font-size: 1.05em;
+  font-size: clamp(1.12rem, 2vw, 1.35rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  width: 100%;
+  max-width: none;
+  text-align: center;
 }
 
 .repo-tile-actions-body {
@@ -2102,13 +2160,20 @@ body .links-search-overlay {
 /* Link modal: scroll area + visual tree (nested columns + stems) */
 .repo-link-picker-stack.repo-link-tree-viz {
   --repo-tree-line: color-mix(in srgb, var(--text-muted) 75%, var(--background-primary));
+  /* One size for folder chips + board tile chips in this tree */
+  --repo-tree-chip-w: 11rem;
+  --repo-tree-chip-h: 2.85rem;
+  /* ~1.1× body text for chips / notes; header is outside this stack */
+  font-size: 1.1em;
   flex: 1 1 auto;
   min-height: 0;
-  overflow-x: auto;
-  overflow-y: auto;
+  min-width: 0;
+  overflow: auto;
   -webkit-overflow-scrolling: touch;
-  margin-bottom: 0.5em;
-  padding: 0.35em 0.25em 0.5em;
+  scrollbar-gutter: stable;
+  margin-bottom: 0.4em;
+  /* Extra inline padding so focus/active borders aren’t clipped by overflow */
+  padding: 0.3em 0.55em 0.45em;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -2128,6 +2193,10 @@ body .links-search-overlay {
   gap: 0;
   position: relative;
   overflow: visible;
+  width: max-content;
+  min-width: 100%;
+  max-width: none;
+  box-sizing: border-box;
 }
 
 /* SVG overlay: orthogonal lines (parent bottom-center → H → child top-centers) */
@@ -2155,7 +2224,7 @@ body .links-search-overlay {
 /* Spacer between rows — lines drawn by SVG above */
 .repo-link-tree-inter-stem-wrap {
   width: 100%;
-  height: 6px;
+  height: 4px;
   flex-shrink: 0;
   margin: 0;
 }
@@ -2174,24 +2243,106 @@ body .links-search-overlay {
 .repo-link-tree-flat-layer {
   width: 100%;
   max-width: 100%;
+  min-width: 0;
   box-sizing: border-box;
+}
+
+/* Sublayers: full-width track + max-content shift (JS: margin-left) so chips aren’t re-centered inside a 100% row. */
+.repo-link-tree-sublayer-track {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+  padding-inline: 0.25rem;
+}
+
+.repo-link-tree-sublayer-shift {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  margin-left: 0;
+  box-sizing: border-box;
+}
+
+.repo-link-tree-sublayer-shift .repo-link-tree-branch-wrap.repo-link-tree-branch-wrap-flat {
+  width: auto;
+  max-width: 100%;
+  align-items: stretch;
+}
+
+.repo-link-tree-sublayer-shift .repo-link-tree-branch-wrap-flat > .repo-link-tree-row--layer {
+  width: auto;
+  max-width: 100%;
+  justify-content: flex-start;
+  box-sizing: border-box;
+}
+
+/* Layer 1 (Data) — static band; one row + horizontal scroll when many roots */
+.repo-link-tree-row-primary.repo-link-tree-layer-depth--1 {
+  padding: 0.26em 0.45em 0.32em;
+  margin-bottom: 0.1em;
+  border-radius: 0 0 8px 8px;
+  background: var(--background-primary);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--background-modifier-border) 55%, transparent);
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: visible;
+  justify-content: flex-start;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Depth bands (unlabeled — visual only) */
+.repo-link-tree-layer-depth--2 {
+  border-radius: 9px;
+  padding: 0.34em 0.48em 0.4em;
+  margin: 0.12em 0;
+  background: color-mix(in srgb, var(--background-secondary) 72%, var(--background-primary));
+  border: 1px solid color-mix(in srgb, var(--background-modifier-border) 70%, transparent);
+}
+
+.repo-link-tree-layer-depth--3 {
+  border-radius: 9px;
+  padding: 0.34em 0.48em 0.4em;
+  margin: 0.12em 0;
+  background: color-mix(in srgb, var(--interactive-accent) 7%, var(--background-secondary));
+  border: 1px solid color-mix(in srgb, var(--interactive-accent) 18%, var(--background-modifier-border));
+}
+
+.repo-link-tree-layer-depth--4 {
+  border-radius: 9px;
+  padding: 0.3em 0.48em 0.36em;
+  margin: 0.12em 0;
+  background: color-mix(in srgb, var(--background-secondary) 88%, var(--background-primary));
+  border: 1px dashed color-mix(in srgb, var(--text-muted) 40%, var(--background-modifier-border));
+}
+
+.repo-link-tree-layer-depth--5.repo-link-tree-flat-layer-notes {
+  padding-top: 0.26em;
+  margin: 0.12em 0;
+  border-radius: 9px;
+  padding-left: 0.4em;
+  padding-right: 0.4em;
+  background: color-mix(in srgb, var(--background-primary) 88%, var(--background-secondary));
+  border: 1px solid var(--background-modifier-border);
 }
 
 .repo-link-tree-flat-layer-notes {
-  padding-top: 0.25em;
+  padding-top: 0.18em;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   width: 100%;
   box-sizing: border-box;
 }
 
-/* Top “primary” layer: chips centered in the modal content area */
 .repo-link-tree-row-primary {
   width: 100%;
   justify-content: center;
-  padding: 0.35em 0 0.45em;
   box-sizing: border-box;
+  flex-wrap: wrap;
 }
 
 .repo-link-tree-row {
@@ -2200,14 +2351,14 @@ body .links-search-overlay {
   flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
-  gap: 0.45em 0.55em;
+  gap: 0.32em 0.4em;
 }
 
 .repo-link-tree-row-root {
   justify-content: center;
   width: 100%;
-  flex-wrap: nowrap;
-  gap: 0.45em 0.55em;
+  flex-wrap: wrap;
+  gap: 0.32em 0.4em;
   position: relative;
   z-index: 0;
 }
@@ -2278,7 +2429,7 @@ body .links-search-overlay {
 .repo-link-tree-row--layer {
   position: relative;
   z-index: 1;
-  padding-top: 6px;
+  padding-top: 4px;
   width: 100%;
   max-width: 100%;
   justify-content: center;
@@ -2343,6 +2494,51 @@ body .links-search-overlay {
   word-break: break-word;
 }
 
+/* Tree modal chips: fixed box; JS scales .repo-link-picker-chip-label to fit */
+.repo-link-tree-viz .repo-link-picker-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* All non-tile chips: same box as tile chips; label fit JS only */
+.repo-link-tree-viz .repo-link-picker-chip:not(.repo-link-picker-chip--tile) {
+  width: var(--repo-tree-chip-w);
+  height: var(--repo-tree-chip-h);
+  flex-shrink: 0;
+  padding: 0.3em 0.45em;
+  font-size: 0.82em;
+}
+
+.repo-link-picker-chip-label {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  text-align: center;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.12;
+}
+
+.repo-link-tree-branch-wrap--tiles .repo-link-picker-chip--tile .repo-link-picker-chip-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+  padding: 0.35rem 0.5rem;
+  line-height: 1.28;
+  /* rem = root size — avoids tiny text from nested .em on .repo-link-tree-viz */
+  font-size: clamp(13px, 0.14rem + 1.65vmin, 15.5px);
+  font-weight: 600;
+  -webkit-text-size-adjust: 100%;
+}
+
 .repo-link-picker-chip:hover:not(.is-disabled) {
   border-color: var(--interactive-accent);
   color: var(--text-normal);
@@ -2359,28 +2555,31 @@ body .links-search-overlay {
   cursor: not-allowed;
 }
 
-/* Tile layer: equal squares; --repo-tile-size = max natural side (set in JS) */
+/* Tile layer: same fixed size as folder chips (--repo-tree-chip-w / --repo-tree-chip-h) */
 .repo-link-tree-branch-wrap--tiles .repo-link-picker-chip--tile {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  line-height: 1.25;
-  font-size: 0.88em;
+  line-height: 1.28;
+  font-size: 1rem;
   word-break: break-word;
   overflow-wrap: anywhere;
   box-sizing: border-box;
-  padding: 0.5em 0.65em;
-  width: var(--repo-tile-size, max-content);
-  height: var(--repo-tile-size, auto);
-  max-width: min(18rem, 90vw);
-  min-width: 2.75em;
-  min-height: 2.75em;
-  aspect-ratio: 1;
+  padding: 0.35rem 0.45rem;
+  width: var(--repo-tree-chip-w);
+  height: var(--repo-tree-chip-h);
+  min-width: var(--repo-tree-chip-w);
+  min-height: var(--repo-tree-chip-h);
+  max-width: var(--repo-tree-chip-w);
+  flex-shrink: 0;
+  aspect-ratio: unset;
+  overflow: hidden;
 }
 
-.repo-link-tree-branch-wrap--tiles.repo-link-tree-tiles--equalized .repo-link-picker-chip--tile {
-  max-width: none;
+/* Tighter spacing between tile chips (link tree) */
+.repo-link-tree-branch-wrap--tiles > .repo-link-tree-row--layer {
+  gap: 0.26em 0.32em;
 }
 
 .repo-link-picker-notes {

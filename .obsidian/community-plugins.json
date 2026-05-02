@@ -1,4 +1,11 @@
 [
   "dataview",
-  "templater-obsidian"
+  "obsidian-tasks-plugin",
+  "templater-obsidian",
+  "data-cards",
+  "metadata-menu",
+  "obsidian-tracker",
+  "actions-uri",
+  "fold-properties-by-default",
+  "pdf-plus"
 ]

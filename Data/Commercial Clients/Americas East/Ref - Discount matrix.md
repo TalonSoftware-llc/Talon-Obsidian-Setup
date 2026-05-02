@@ -1,4 +1,0 @@
-# Discount matrix
-
-Demo thresholds.
-

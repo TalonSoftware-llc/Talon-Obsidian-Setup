@@ -1,4 +1,0 @@
-# Security questionnaire
-
-Demo boilerplate.
-

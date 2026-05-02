@@ -2,6 +2,9 @@
 (() => {
   const app = this.app;
   const ROOT = "Data/Tools/Projects";
+  const ARCHIVE_COMPLETED_ROOT = "z_archive/Tools/Projects/Completed";
+  const now = new Date();
+  const today = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
   /** Main notes live at Data/Tools/Projects/[Project]/[any].md (project folder root or nested). */
   function isProjectMainNote(p) {
     const path = p.file.path;
@@ -10,15 +13,37 @@
     if (parts.length !== 5) return false;
     return path.endsWith(".md");
   }
+  /** Archived main notes at z_archive/Tools/Projects/Completed/[Project]/[any].md */
+  function isArchivedCompletedMainNote(p) {
+    const path = p.file.path;
+    if (!path.startsWith(ARCHIVE_COMPLETED_ROOT + "/")) return false;
+    const parts = path.split("/").filter(Boolean);
+    if (parts.length !== 7) return false;
+    return path.endsWith(".md");
+  }
+  function toIso(raw) {
+    if (!raw) return "";
+    if (typeof raw === "object" && raw.toISOString) return raw.toISOString().slice(0, 10);
+    const s = String(raw).trim().slice(0, 10);
+    return /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : "";
+  }
 
   let pages = [];
   try {
     pages = Array.from(dv.pages('"' + ROOT + '"'));
   } catch (e) {}
+  let archivedCompletedPages = [];
+  try {
+    archivedCompletedPages = Array.from(dv.pages('"' + ARCHIVE_COMPLETED_ROOT + '"'));
+  } catch (e) {}
   const candidates = pages.filter(p => p["dashboard-include"] === true && isProjectMainNote(p));
   const byPri = (a, b) => (parseInt(b.priority, 10) || 0) - (parseInt(a.priority, 10) || 0);
   const started = candidates.filter(p => (p.status || "").toLowerCase() === "started").sort(byPri);
   const unstarted = candidates.filter(p => (p.status || "").toLowerCase() === "unstarted").sort(byPri);
+  const completedToday = archivedCompletedPages
+    .filter(p => p["dashboard-include"] === true && isArchivedCompletedMainNote(p) && toIso(p["completed-on"] || p.completedOn) === today)
+    .map(p => ({ ...p, __completedToday: true }))
+    .sort(byPri);
 
   const blockWrapper = dv.container.createEl("div", { cls: "project-cards-block" });
 
@@ -57,25 +82,35 @@
         const total = tasks.length;
         const completed = tasks.where(t => t.completed).length;
         const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+        const isCelebrate = percent >= 100 || p.__completedToday === true;
 
         const cell = row.createEl("div", { cls: "project-card-cell" });
-        const card = cell.createEl("div", { cls: "project-card" });
+        const cardClasses = ["project-card"];
+        if (isCelebrate) cardClasses.push("project-card-completed-today");
+        const card = cell.createEl("div", { cls: cardClasses.join(" ") });
 
         const title = card.createEl("h3", { cls: "project-title" });
         const link = title.createEl("a", { href: p.file.path, text: p.file.name, cls: "internal-link" });
         link.setAttribute("data-href", p.file.path);
+        if (p.__completedToday) {
+          card.createEl("div", { cls: "project-completed-badge", text: "Completed today" });
+        }
 
         const cardRow = card.createEl("div", { cls: "project-card-row" });
 
-        const circleContainer = cardRow.createEl("div", { cls: "circle-container" });
+        const circleClasses = ["circle-container"];
+        if (isCelebrate) circleClasses.push("circle-container-complete");
+        const circleContainer = cardRow.createEl("div", { cls: circleClasses.join(" ") });
         circleContainer.style.setProperty("--fill-percent", String(percent));
         circleContainer.createEl("div", {
           cls: "progress-circle",
-          attr: { style: `background: linear-gradient(to top, #2e7d32 0%, #2e7d32 ${percent}%, #ffffff ${percent}%);` }
+          attr: { style: `background: linear-gradient(to top, ${isCelebrate ? "#16a34a" : "#2e7d32"} 0%, ${isCelebrate ? "#16a34a" : "#2e7d32"} ${percent}%, #ffffff ${percent}%);` }
         });
         circleContainer.createEl("div", { cls: "progress-indicator-line" });
         const indicator = circleContainer.createEl("div", { cls: "progress-indicator" });
-        indicator.createEl("div", { cls: "progress-indicator-box", text: `${percent}%` });
+        const indicatorClasses = ["progress-indicator-box"];
+        if (isCelebrate) indicatorClasses.push("progress-indicator-box-complete");
+        indicator.createEl("div", { cls: indicatorClasses.join(" "), text: `${percent}%` });
 
         let priorityVal = Math.min(10, Math.max(1, parseInt(p.priority, 10) || 1));
         const filePath = p.file.path;
@@ -114,7 +149,7 @@
 
   function refreshList() {
     cardsContainer.empty();
-    const list = mode === "active" ? started : unstarted;
+    const list = mode === "active" ? [...completedToday, ...started] : unstarted;
     if (list.length === 0) {
       cardsContainer.createEl("p", {
         cls: "project-dashboard-empty",
@@ -140,7 +175,7 @@
     refreshList();
   });
 
-  if (started.length === 0 && unstarted.length === 0) {
+  if (started.length === 0 && unstarted.length === 0 && completedToday.length === 0) {
     cardsContainer.createEl("p", { text: "No projects found (set status + dashboard-include on main notes under Data/Tools/Projects/)." });
     return;
   }

@@ -1,0 +1,11 @@
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Obsidian — per-machine layout (tabs, splits). Safe to omit from Git.
+.obsidian/workspace*.json
+
+# Merge / rename collision debris (Obsidian / sync)
+*Edit conflict*
+*Name clash*

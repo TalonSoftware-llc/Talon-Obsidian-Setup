@@ -1,10 +1,11 @@
 {
   "enabledCssSnippets": [
-    "agenda-cards",
-    "ideas-cards",
-    "plus-cards",
-    "project-cards",
     "status-buttons",
+    "project-cards",
+    "plus-cards",
+    "ideas-cards",
+    "agenda-cards",
     "work-dashboard"
-  ]
+  ],
+  "baseFontSize": 16
 }

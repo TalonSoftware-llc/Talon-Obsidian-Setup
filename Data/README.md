@@ -1,13 +1,13 @@
-# `Data/` (Repository navigator)
+# `Data/` (content tree)
 
-The Repository dashboard (**`Tools/Repository.md`**, slider → **Repository**) hides **`Data/Tools/`** at the top level, then shows **layers** under `Data/`.
+Notes and boards you manage live here. **`Data/Tools/`** is reserved for tool-owned paths (Agenda, Projects, Repository inbox); the **Repository** dashboard hides that branch when you browse from vault-root `Data/`.
 
-## Demo layout
+## Starting empty
 
-| Layer | What you see |
-|-------|----------------|
-| **0 — Base** | Six folders: *Commercial Clients*, *Government & Public*, *Healthcare & Life Sciences*, *Manufacturing & Supply*, *Retail & Hospitality*, *Internal Operations*. Each has a `README.md`. |
-| **1 — Region / segment** | Six subfolders per base (e.g. *Americas East*, *EMEA North*, …). Sample READMEs, regional notes, SOW/ref docs. |
-| **2 — Boards** | Under **`Commercial Clients` → `Americas East` only:** six folders named **`Board - …`**, each with **`_board.md`** (tiles) and **six notes** inside. |
+This repo ships **without sample notes** under `Data/` outside `Data/Tools/`. To use **Repository**:
 
-**Tools data** (Agenda, Projects, Repository capture) stays under **`Data/Tools/`** — same vault, separate from this tree.
+1. Create folders under `Data/` for your own hierarchy (for example `Areas/Topic/` …).
+2. Add a **board** folder that contains `_board.md` (see `Tools/Repository.md` in-app behavior).
+3. Put markdown notes beside `_board.md` or organize into tiles via the board YAML.
+
+There is nothing to delete—add structure as you go.

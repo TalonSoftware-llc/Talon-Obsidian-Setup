@@ -1,4 +1,0 @@
-# QBR agenda
-
-Demo template.
-
